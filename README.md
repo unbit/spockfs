@@ -284,14 +284,46 @@ UTIMENS
 POST
 ----
 
+FUSE hook: create()
+
+X-Spock headers used: X-Spock-mode
+
+Expected status: 201 Created on success
+
+
+
 PUT
 ---
+
+FUSE hook: write()
+
+X-Spock headers used: none
+
+Standard headers used: Content-Range
+
+Expected status: 200 OK on success
+
 
 GET
 ---
 
+FUSE hook: read()
+
+X-Spock headers used: none
+
+Standard headers used: Range
+
+Expected status: 200 OK on success
+
 DELETE
 ------
+
+FUSE hook: unlink()
+
+X-Spock headers used: none
+
+Expected status: 200 OK on success
+
 
 
 
