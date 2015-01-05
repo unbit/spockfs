@@ -587,7 +587,7 @@ end:
 }
 
 static int spockfs_getxattr(const char *path, const char *name, char *buf, size_t len) {
-	
+
 	spockfs_init2();
 
 	spockfs_header_num("size", len);
