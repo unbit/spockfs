@@ -84,6 +84,17 @@ Finally this two "standard" headers are used:
 
 Obviously you can use all of the standard headers you want: all of the request/response cycles of SpockFS are HTTP compliant.
 
+Errors are managed with this simple http_code->errno mapping:
+
+* 403 Forbidden -> EACCES
+* 404 Not Found -> ENOENT
+* 405 Method Not Allowed -> ENOSYS
+* 409 Conflict -> EEXIST
+* 412 Precondition Failed -> ENOTEMPTY
+* 413 Request Entity Too Large -> ERANGE
+* 415 Unsupported Media Type -> ENODATA
+* 500 Internal Server Error -> EIO (default error)
+
 READDIR
 -------
 
@@ -186,6 +197,29 @@ def application(environ, start_response):
 MKNOD
 -----
 
+FUSE hook: mknod()
+
+X-Spock headers used: X-Spock-mode, X-Spock-dev
+
+Expected status: 201 Created on success
+
+This is the mknod() POSIX function, you can use it for creating fifos, devices and so on (well, even regular files ...)
+
+raw HTTP example:
+
+```
+MKNOD /foobar/fifo HTTP/1.1
+Host: example.com
+X-Spock-mode: 4480
+X-Spock-dev: 0
+
+HTTP/1.1 201 Created
+Content-Length: 0
+
+```
+
+The X-Spock-mode value (octal: 010600) is built as `stat.S_IFIFO | stat.S_IWUSR|stat.S_IRUSR` (so a fifo with 600 permissions). The dev value is left as 0 as it is not used.
+
 OPEN
 ----
 
@@ -194,6 +228,7 @@ FUSE hook: open
 X-Spock headers used: X-Spock-flag
 
 Expected status: 200 OK on success
+
 
 CHMOD
 -----
