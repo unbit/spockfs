@@ -71,10 +71,10 @@ The following ones are for statvfs() calls, they map 1:1 with the stavfs struct,
 * X-Spock-namemax
 
 READDIR
-*******
+-------
 
 GETATTR
-*******
+-------
 
 
 The reference FUSE client
