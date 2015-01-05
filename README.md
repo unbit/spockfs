@@ -7,7 +7,7 @@ It is built upon plain HTTP methods and headers (no XML, no XML and no XML) and 
 
 This page is mainly for Specs, if you only want to download a server and a client skip here: https://github.com/unbit/spockfs/blob/master/README.md#the-reference-fuse-client
 
-Specs 0.1
+SPECS 0.1
 =========
 
 Note: we use the term "object" for identifying filesystem items. They can be directories, files, symlinks or whatever supported by the specs. When the term "object" is used it means the method can be applied to any kind of resource.
