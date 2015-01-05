@@ -5,8 +5,8 @@ SpockFS is an HTTP based network filesystem
 
 It is built upon plain HTTP methods and headers (no XML, no XML and no XML) and supports all of the FUSE posix-related hooks (yes you can manage symlinks too). 
 
-Specs
-=====
+Specs 0.1
+=========
 
 To avoid "collisions" with WebDAV services, new methods have been added, while the "classic" ones are used where possible.
 
@@ -69,6 +69,13 @@ The following ones are for statvfs() calls, they map 1:1 with the stavfs struct,
 * X-Spock-favail
 * X-Spock-fsid
 * X-Spock-namemax
+
+READDIR
+*******
+
+GETATTR
+*******
+
 
 The reference FUSE client
 =========================
