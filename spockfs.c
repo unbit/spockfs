@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <curl/curl.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #define spockfs_check(x) if (sh_rr->code != x) {\
                 		ret = spockfs_errno(sh_rr->code);\
@@ -53,6 +54,8 @@
 static struct spockfs_config {
 	char *http_url;
 	size_t http_url_len;
+	CURLSH *dns_cache;
+	pthread_mutex_t dns_lock;
 } spockfs_config;
 
 struct spockfs_http_rr {
@@ -281,6 +284,7 @@ static int spockfs_http(const char *method, const char *path, struct spockfs_htt
 		return -ENOMEM;
 	}
 
+	curl_easy_setopt(curl, CURLOPT_SHARE, spockfs_config.dns_cache);
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
 	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 30);
 	curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -852,7 +856,21 @@ static int spockfs_opt_proc(void *data, const char *arg, int key, struct fuse_ar
 	return 1;
 }
 
+void spockfs_dns_lock(CURL *curl, curl_lock_data data, curl_lock_access access, void *userptr) {
+	pthread_mutex_lock(&spockfs_config.dns_lock);
+}
+
+void spockfs_dns_unlock(CURL *curl, curl_lock_data data, void *userptr) {
+	pthread_mutex_unlock(&spockfs_config.dns_lock);
+}
+
+
 int main(int argc, char *argv[]) {
+	pthread_mutex_init(&spockfs_config.dns_lock, NULL);
+	spockfs_config.dns_cache = curl_share_init();
+	curl_share_setopt(spockfs_config.dns_cache, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
+	curl_share_setopt(spockfs_config.dns_cache, CURLSHOPT_LOCKFUNC, spockfs_dns_lock);
+	curl_share_setopt(spockfs_config.dns_cache, CURLSHOPT_UNLOCKFUNC, spockfs_dns_unlock);
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	fuse_opt_parse(&args, NULL, NULL, spockfs_opt_proc);
 	return fuse_main(args.argc, args.argv, &spockfs_ops, NULL);
