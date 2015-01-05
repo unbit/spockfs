@@ -110,6 +110,12 @@ static int spockfs_get(struct wsgi_request *wsgi_req, char *path) {
 		goto end;
 	}
 
+	if (!S_ISREG(st.st_mode)) {
+		errno = EACCES;
+		spockfs_errno(wsgi_req);
+                goto end;
+	}
+
 	size_t fsize = st.st_size;
 	// security check
 	if (wsgi_req->range_from > fsize) {
