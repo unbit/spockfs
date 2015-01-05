@@ -8,6 +8,8 @@ It is built upon plain HTTP methods and headers (no XML, no XML and no XML) and 
 Specs 0.1
 =========
 
+Note: we use the term "object" for identifying filesystem items. They can be directories, files, symlinks or whatever supported by the specs. When the term "object" is used it means the method can be applied to any kind of resource.
+
 To avoid "collisions" with WebDAV services, new methods have been added, while the "classic" ones are used where possible.
 
 The following methods have been added:
@@ -72,6 +74,42 @@ The following ones are for statvfs() calls, they map 1:1 with the stavfs struct,
 
 READDIR
 -------
+
+FUSE hook: readdir()
+
+X-Spock headers used: none
+
+Expected status: 200 OK on success
+
+
+This method returns the list of objects in a directory as a text stream with every object separated by '\n':
+
+raw HTTP example:
+
+```
+READDIR /foobar HTTP/1.1
+Host: example.com
+
+HTTP/1.1 200 OK
+Content-Length: 21
+
+.
+..
+file001
+file002
+```
+
+WSGI example (spockfs_build_path() is an immaginary function that builds a filesystem path from a PATH_INFO var)
+
+```python
+import os
+def application(environ, start_response):
+    path = spockfs_build_path(environ['PATH_INFO'])
+    if environ['REQUEST_METHOD'] == 'READDIR':
+        output = '\n'.join(['.', '..'] + os.listdir(path))
+        start_response('200 OK', [('Content-Length', str(len(output)))])
+        return [output]
+```
 
 GETATTR
 -------
