@@ -5,7 +5,7 @@ SpockFS is an HTTP based network filesystem
 
 It is built upon plain HTTP methods and headers (no XML, no XML and no XML) and supports all of the FUSE posix-related hooks (yes you can manage symlinks too).
 
-This page is mainly for Specs, if you only want to download a server and a client skip here: 
+This page is mainly for Specs, if you only want to download a server and a client skip here: https://github.com/unbit/spockfs/blob/master/README.md#the-reference-fuse-client
 
 Specs 0.1
 =========
