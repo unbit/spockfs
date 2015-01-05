@@ -75,6 +75,15 @@ The following ones are for statvfs() calls, they map 1:1 with the stavfs struct,
 * X-Spock-fsid
 * X-Spock-namemax
 
+
+Finally this two "standard" headers are used:
+
+* Content-Length (required for every HTTP/1.1 response)
+* Range (for GET and FALLOCATE methods)
+* Content-Range (for PUT method)
+
+Obviously you can use all of the standard headers you want: all of the request/response cycles of SpockFS are HTTP compliant.
+
 READDIR
 -------
 
@@ -116,6 +125,63 @@ def application(environ, start_response):
 
 GETATTR
 -------
+
+FUSE hook: getattr()
+
+X-Spock headers used: X-Spock-mode, X-Spock-uid, X-Spock-gid, X-Spock-size, X-Spock-mtime, X-Spock-atime, X-Spock-ctime, X-Spock-nlink, X-Spock-blocks, X-Spock-dev, X-Spock-ino
+
+Expected status: 200 OK on success
+
+This method returns stat() attributes of an object. In POSIX it would be an lstat() call.
+
+raw HTTP example
+
+```
+GETATTR /foobar HTTP/1.1
+Host: example.com
+
+HTTP/1.1 200 OK
+Content-Length: 0
+X-Spock-mode: 17407
+X-Spock-uid: 1000
+X-Spock-gid: 1000
+X-Spock-size: 374
+X-Spock-mtime: 1420481543
+X-Spock-atime: 1420481542
+X-Spock-ctime: 1420481543
+X-Spock-nlink: 11
+X-Spock-blocks: 1
+X-Spock-dev: 16777224
+X-Spock-ino: 106280423
+
+```
+
+the values of the headers map 1:1 with the POSIX `struct stat` fields
+
+WSGI example
+
+```python
+import os
+def application(environ, start_response):
+    path = spockfs_build_path(environ['PATH_INFO'])
+    if environ['REQUEST_METHOD'] == 'GETATTR':
+        st = os.stat(path)
+        headers = []
+        headers.append(('Content-Length', '0'))
+        headers.append(('X-Spock-mode', str(st.st_mode))
+        headers.append(('X-Spock-uid', str(st.st_uid))
+        headers.append(('X-Spock-gid', str(st.st_gid))
+        headers.append(('X-Spock-size', str(st.st_size))
+        headers.append(('X-Spock-mtime', str(st.st_mtime))
+        headers.append(('X-Spock-atime', str(st.st_atime))
+        headers.append(('X-Spock-ctime', str(st.st_ctime))
+        headers.append(('X-Spock-nlink', str(st.st_nlink))
+        headers.append(('X-Spock-blocks', str(st.st_blocks))
+        headers.append(('X-Spock-dev', str(st.st_dev))
+        headers.append(('X-Spock-ino', str(st.st_ino))
+        start_response('200 OK', headers)
+        return []
+```
 
 MKNOD
 -----
