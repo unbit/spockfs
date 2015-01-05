@@ -21,8 +21,8 @@ static struct uwsgi_option spockfs_options[] = {
 };
 
 static int spockfs_build_path(char *path, struct wsgi_request *wsgi_req, char *item, uint16_t item_len) {
-	char *base = (char *) uwsgi_apps[wsgi_req->app_id].responder0;
-	size_t base_len = (size_t) uwsgi_apps[wsgi_req->app_id].responder1;
+	char *base = (char *) uwsgi_apps[wsgi_req->app_id].interpreter;
+	size_t base_len = (size_t) uwsgi_apps[wsgi_req->app_id].callable;
 
 	// first check for size
 	if (base_len + item_len > PATH_MAX) return -1;
@@ -950,14 +950,12 @@ static void spockfs_apps() {
 		// pretty useless, just for statistics
 		time_t now = uwsgi_now();
 		int id = uwsgi_apps_cnt;
-		struct uwsgi_app *ua = uwsgi_add_app(id, spockfs_plugin.modifier1, usl->value, equal-usl->value, NULL, NULL);
+		struct uwsgi_app *ua = uwsgi_add_app(id, spockfs_plugin.modifier1, usl->value, equal-usl->value, equal+1, (void *) usl->len - ((equal-usl->value)+1));
 		if (!ua) {
 			uwsgi_log("[spockfs] unable to mount %.*s\n", equal-usl->value, usl->value);
 			exit(1);
 		}
 
-		ua->responder0 = equal+1;
-		ua->responder1 = (void *) strlen(equal+1);
 		ua->started_at = now;
 		ua->startup_time = uwsgi_now() - now;
 		uwsgi_log("SpockFS app/mountpoint %d (%.*s) loaded at %p for directory %.*s\n", id, equal-usl->value, usl->value, ua, usl->len - ((equal-usl->value)+1), equal+1);
