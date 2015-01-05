@@ -59,6 +59,7 @@ The following ones are for stat()-related operations:
 * X-Spock-dev (the device id)
 * X-Spock-ino (the inode number)
 * X-Spock-flag (generic flag, used by open() too)
+* X-Spock-target (generic string used for symlink values, rename operations and for the names of extended attributes)
 
 The following ones are for statvfs() calls, they map 1:1 with the stavfs struct, and you will use them only if you want to implement the STATFS method in your server/client:
 
@@ -113,6 +114,83 @@ def application(environ, start_response):
 
 GETATTR
 -------
+
+MKNOD
+-----
+
+OPEN
+----
+
+FUSE hook: open
+
+X-Spock headers used: X-Spock-flag
+
+Expected status: 200 OK on success
+
+CHMOD
+-----
+
+CHOWN
+-----
+
+TRUNCATE
+--------
+
+ACCESS
+------
+
+SYMLINK
+-------
+
+READLINK
+--------
+
+RMDIR
+-----
+
+MKDIR
+-----
+
+LINK
+----
+
+RENAME
+------
+
+FALLOCATE
+---------
+
+STATFS
+------
+
+LISTXATTR
+---------
+
+GETXATTR
+--------
+
+SETXATTR
+--------
+
+REMOVEXATTR
+-----------
+
+UTIMENS
+-------
+
+POST
+----
+
+PUT
+---
+
+GET
+---
+
+DELETE
+------
+
+
 
 
 The reference FUSE client
