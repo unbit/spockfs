@@ -92,7 +92,7 @@ Errors are managed with this simple http_code->errno mapping:
 * 409 Conflict -> EEXIST
 * 412 Precondition Failed -> ENOTEMPTY
 * 413 Request Entity Too Large -> ERANGE
-* 415 Unsupported Media Type -> ENODATA
+* 415 Unsupported Media Type -> ENODATA/ENOATTR
 * 500 Internal Server Error -> EIO (default error)
 
 Authentication/Authorization/Crypto
@@ -344,6 +344,23 @@ Expected status: 200 OK on success
 The reference FUSE client
 =========================
 
+To build the 'official' FUSE client (based on libcurl) just clone the repository and run 'make'.
+
+Finally run the resulting `spockfs` binary:
+
+```sh
+./spockfs <url> <mountpoint>
+```
+
+as an example to mount an url under /mnt/foobar
+
+```sh
+./spockfs https://foo:bar@example.com/mydisk /mnt/foobar
+```
+
+The client supports interruptions (you can interrupt stuck filesystem requests in the middle), dns caching (every result is cached for 60 seconds) and is fully thread-safe. Every operation has a 30 seconds timeout, after which EIO is returned. High-availability is easy affordable as every operation is stateless, and in case of a malfunctioning server the filesystem will return back to full operation mode as soon as the server is back (in the mean time EIO is returned). The default 60 seconds TTL for dns cache allows easy 'failover' of nodes.
+
+
 The reference server implementation (uWSGI plugin)
 ==================================================
 
@@ -353,3 +370,8 @@ Why ?
 Unbit is already developing an high performance 9p network filesystem server (https://github.com/unbit/9spock), but during development we came up with this really simple (and working) implementation. You can build a server really fast and over battle-tested technologies (nginx, apache, uWSGI ...) and web frameworks.
 
 Finally, after having worked/developed the https://github.com/unbit/davvy project (a WebDAV/CalDAV/CardDAV django implementation) i came up with the conclusion that i will never touch again any WebDAV-related thing. Seriously.
+
+Why Spock ?
+===========
+
+Why not ? Instead of using cryptozoological animals or musicians names (or acronyms, like my company generally does) this time i want to make a tribute to the best figure of The United Federation of Planets 
