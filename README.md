@@ -41,6 +41,35 @@ While the following "standard" ones are used:
 * GET
 * DELETE
 
+A group of headers are required to manage filesystem-related informations or special operations. All headers are prefixed with `X-Spock-`.
+
+The following ones are for stat()-related operations:
+
+* X-Spock-mode (for mode_t values and similar)
+* X-Spock-uid (for uid)
+* X-Spock-gid (for gid)
+* X-Spock-size (for specifying sizes)
+* X-Spock-mtime (the modification time in unix time)
+* X-Spock-atime (the access time in unix time)
+* X-Spock-ctime (the creation time in unix time)
+* X-Spock-nlink (the number of links)
+* X-Spock-blocks (the number of blocks)
+* X-Spock-dev (the device id)
+* X-Spock-ino (the inode number)
+* X-Spock-flag (generic flag, used by open() too)
+
+The following ones are for statvfs() calls, they map 1:1 with the stavfs struct, and you will use them only if you want to implement the STATFS method in your server/client:
+
+* X-Spock-bsize
+* X-Spock-frsize
+* X-Spock-bfree
+* X-Spock-bavail
+* X-Spock-files
+* X-Spock-ffree
+* X-Spock-favail
+* X-Spock-fsid
+* X-Spock-namemax
+
 The reference FUSE client
 =========================
 
