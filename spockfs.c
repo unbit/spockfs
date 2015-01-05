@@ -269,6 +269,11 @@ static char *spockfs_prepare_url(const char *base, size_t base_len, const char *
 	return url;
 }
 
+static int spockfs_interrupted(void *clientp, curl_off_t dltotal,  curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+	if (fuse_interrupted()) return -1;
+	return 0;
+}
+
 static int spockfs_http(const char *method, const char *path, struct spockfs_http_rr *sh_rr, struct curl_slist *headers) {
 	int ret = -EIO;
 	if (!sh_rr) return ret;
@@ -284,6 +289,8 @@ static int spockfs_http(const char *method, const char *path, struct spockfs_htt
 		return -ENOMEM;
 	}
 
+	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, spockfs_interrupted);
+	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 	curl_easy_setopt(curl, CURLOPT_SHARE, spockfs_config.dns_cache);
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
 	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 30);
