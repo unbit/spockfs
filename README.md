@@ -337,7 +337,14 @@ X-Spock headers used: none
 
 Expected status: 200 OK on success
 
+Todo
+----
 
+Try to find a solution for locking.
+
+Define an api for the POLL feature (if we find some useful usage for it)
+
+Define an api for the IOCTL feature.
 
 
 
