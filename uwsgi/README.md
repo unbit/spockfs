@@ -1,0 +1,2 @@
+The SpockFS uWSGI plugin
+========================
