@@ -340,7 +340,13 @@ static int spockfs_errno(long code) {
 		case 413:
 			return -ERANGE;
 		case 415:
+#ifdef ENODATA
 			return -ENODATA;
+#endif
+#ifdef ENOATTR
+			return -ENOATTR;
+#endif
+			break;
 		default:
 			break;
 	}
