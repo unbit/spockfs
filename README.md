@@ -270,8 +270,23 @@ Expected status: 200 OK on success
 CHMOD
 -----
 
+FUSE hook: chmod
+
+X-Spock headers used: X-Spock-mode
+
+Expected status: 200 OK on success
+
+
 CHOWN
 -----
+
+FUSE hook: chown
+
+X-Spock headers used: X-Spock-uid, X-Spock-gid
+
+Expected status: 200 OK on success
+
+Note: this will probably never success if you run your server over a true filesystem as unprivileged user
 
 TRUNCATE
 --------
