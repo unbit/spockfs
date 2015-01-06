@@ -14,6 +14,11 @@
                 		goto end;\
         		}
 
+#define spockfs_check2(x, y) if (sh_rr->code != x && sh_rr->code != y) {\
+                                ret = spockfs_errno(sh_rr->code);\
+                                goto end;\
+                        }
+
 #define spockfs_init() int ret = -EIO; \
 			struct spockfs_http_rr *sh_rr = calloc(sizeof(struct spockfs_http_rr), 1);\
 			if (!sh_rr) {\
@@ -499,6 +504,8 @@ static int spockfs_read(const char *path, char *buf, size_t size, off_t offset, 
         spockfs_header_range("Range", offset, ((offset+size)-1));
 
 	spockfs_run("GET", headers);
+
+	spockfs_check2(206, 200);
 
 	if (sh_rr->len >= size) {
 		memcpy(buf, sh_rr->buf, size);
