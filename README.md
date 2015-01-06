@@ -368,6 +368,25 @@ Standard headers used: Content-Range
 
 Expected status: 200 OK on success
 
+Suggestions: you can use lseek()+write() or directly pwrite() in server implementations.
+
+Write a chunk of data to the specified file. offset and size to write are specified by the Content-Range, the data to write are the body of the request.
+
+raw HTTP example
+
+```
+PUT /enterprise HTTP/1.1
+Host: example.com
+Content-Range: bytes=100-104
+Content-Length: 5
+
+spockHTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
+this will write the string 'spock' at bytes 100, 101, 102, 103 and 104 of the enterprise file.
+
 
 GET
 ---
@@ -378,7 +397,24 @@ X-Spock headers used: none
 
 Standard headers used: Range
 
-Expected status: 200 OK on success
+Expected status: 206 Partial Content or 200 OK on success
+
+Read a chunk from a file offset. The Range header specifies offset and end of the part to read.
+
+raw HTTP example
+
+```
+GET /enterprise HTTP/1.1
+Host: example.com
+Range: bytes=100-104
+
+HTTP/1.1 206 Partial Content
+Content-Length: 5
+
+spock
+```
+
+this returns bytes 100, 101, 102, 103 and 104 previously written by the PUT example
 
 DELETE
 ------
@@ -388,6 +424,17 @@ FUSE hook: unlink()
 X-Spock headers used: none
 
 Expected status: 200 OK on success
+
+This is REST compliant, so nothing special here
+
+raw HTTP example
+
+```
+DELETE /enterprise HTTP/1.1
+Host: example.com
+
+HTTP/1.1 200 OK
+```
 
 Todo
 ----
