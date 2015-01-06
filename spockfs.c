@@ -586,7 +586,11 @@ end:
 	spockfs_free2();
 }
 
+#ifndef __APPLE__
 static int spockfs_getxattr(const char *path, const char *name, char *buf, size_t len) {
+#else
+static int spockfs_getxattr(const char *path, const char *name, char *buf, size_t len, uint32_t position) {
+#endif
 
 	spockfs_init2();
 
@@ -630,7 +634,11 @@ end:
 	spockfs_free2();
 }
 
+#ifndef __APPLE__
 static int spockfs_setxattr(const char *path, const char *name, const char *buf, size_t len, int flag) {
+#else
+static int spockfs_setxattr(const char *path, const char *name, const char *buf, size_t len, int flag, uint32_t position) {
+#endif
 
 	spockfs_init2();
 
@@ -777,6 +785,7 @@ end:
 	spockfs_free2();
 }
 
+#ifndef __APPLE__
 static int spockfs_fallocate(const char *path, int mode, off_t offset, off_t size, struct fuse_file_info *fi) {
 	
 	spockfs_init2();
@@ -793,6 +802,7 @@ static int spockfs_fallocate(const char *path, int mode, off_t offset, off_t siz
 end:
 	spockfs_free2();	
 }
+#endif
 
 static int spockfs_utimens(const char *path, const struct timespec tv[2]) {
 
@@ -830,7 +840,9 @@ static struct fuse_operations spockfs_ops = {
 	.mkdir = spockfs_mkdir,
 	.link = spockfs_link,
 	.rename = spockfs_rename,
+#ifndef __APPLE__
 	.fallocate = spockfs_fallocate,
+#endif
 	.statfs = spockfs_statfs,
 	.listxattr = spockfs_listxattr,
 	.getxattr = spockfs_getxattr,
