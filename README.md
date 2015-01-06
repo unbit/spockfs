@@ -127,6 +127,28 @@ file001
 file002
 ```
 
+curl example:
+
+```sh
+curl -X READDIR -D /dev/stdout http://host:port/
+HTTP/1.1 200 OK
+Content-Length: 106
+
+linkme
+resizeme
+scanme
+forbidden
+.
+the_fifo_of_spock
+..
+fastcopy
+keyvalue
+movehere
+linkdir0
+bigfile
+touch
+```
+
 WSGI example (spockfs_build_path() is an immaginary function that builds a filesystem path from a PATH_INFO var)
 
 ```python
