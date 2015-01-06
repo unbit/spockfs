@@ -95,6 +95,11 @@ Errors are managed with this simple http_code->errno mapping:
 * 415 Unsupported Media Type -> ENODATA
 * 500 Internal Server Error -> EIO (default error)
 
+Authentication/Authorization/Crypto
+-----------------------------------
+
+Security should be managed at the webserver level (nginx, apache, uWSGI, whatever you use), but you are free to extend you server-side app to support HTTP-related security techiques (just ensure the client supports them)
+
 READDIR
 -------
 
