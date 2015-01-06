@@ -85,6 +85,11 @@ static void spockfs_errno(struct wsgi_request *wsgi_req) {
 	}
 }
 
+#define spockfs_check_readonly(x) if (uwsgi_apps[x->app_id].responder0) {\
+				uwsgi_403(x); \
+				return UWSGI_OK; \
+			   }
+
 static int spockfs_response_add_header_num(struct wsgi_request *wsgi_req, char *key, uint16_t kl, uint64_t n) {
         char buf[sizeof(UMAX64_STR)+1];
         int ret = snprintf(buf, sizeof(UMAX64_STR)+1, "%llu", (unsigned long long) n);
@@ -150,7 +155,13 @@ static int spockfs_access(struct wsgi_request *wsgi_req, char *path) {
         char *mode = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_MODE", 17, &mode_len);
         if (!mode) goto end;
 
-        if (access(path, uwsgi_str_num(mode, mode_len))) {
+	int i_mode = uwsgi_str_num(mode, mode_len); 
+
+	if (i_mode & W_OK) {
+		spockfs_check_readonly(wsgi_req);
+	}
+
+        if (access(path, i_mode)) {
                 spockfs_errno(wsgi_req);
                 goto end;
         }
@@ -165,6 +176,8 @@ end:
 
 #ifndef __APPLE__
 static int spockfs_fallocate(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
 
 	uint16_t mode_len = 0;
         char *mode = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_MODE", 17, &mode_len);
@@ -195,6 +208,9 @@ end2:
 	The lucky thing is that we only need the first part of the range string
 */
 static int spockfs_put(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
+
         int fd = open(path, O_WRONLY);
         if (fd < 0) {
 		spockfs_errno(wsgi_req);
@@ -235,6 +251,8 @@ end2:
 
 static int spockfs_mkdir(struct wsgi_request *wsgi_req, char *path) {
 
+	spockfs_check_readonly(wsgi_req);
+
         uint16_t mode_len = 0;
         char *mode = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_MODE", 17, &mode_len);
 	if (!mode) goto end;
@@ -252,6 +270,8 @@ end:
 }
 
 static int spockfs_post(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
 
         uint16_t mode_len = 0;
         char *mode = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_MODE", 17, &mode_len);
@@ -399,6 +419,8 @@ end:
 
 static int spockfs_utimens(struct wsgi_request *wsgi_req, char *path) {
 
+	spockfs_check_readonly(wsgi_req);
+
 	int fd = open(path, O_WRONLY);
 	if (fd < 0) {
 		spockfs_errno(wsgi_req);
@@ -443,6 +465,9 @@ end2:
 }
 
 static int spockfs_setxattr(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
+
         char *buf = NULL;
         char *name = NULL;
 
@@ -485,6 +510,9 @@ end:
 }
 
 static int spockfs_removexattr(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
+
         char *name = NULL;
 
         uint16_t target_len = 0;
@@ -516,7 +544,13 @@ static int spockfs_open(struct wsgi_request *wsgi_req, char *path) {
         char *flag = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_FLAG", 17, &flag_len);
         if (!flag) goto end;
 
-	int fd = open(path, uwsgi_str_num(flag, flag_len));
+	int i_flag = uwsgi_str_num(flag, flag_len);
+
+	if (i_flag & O_WRONLY || i_flag & O_RDWR) {
+		spockfs_check_readonly(wsgi_req);
+	}
+
+	int fd = open(path, i_flag);
 	if (fd < 0) {
 		spockfs_errno(wsgi_req);
                 goto end;
@@ -533,6 +567,8 @@ end:
 
 
 static int spockfs_truncate(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
 
         uint16_t size_len = 0;
         char *size = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_SIZE", 17, &size_len);
@@ -552,6 +588,8 @@ end:
 
 static int spockfs_chmod(struct wsgi_request *wsgi_req, char *path) {
 
+	spockfs_check_readonly(wsgi_req);
+
         uint16_t mode_len = 0;
         char *mode = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_MODE", 17, &mode_len);
         if (!mode) goto end;
@@ -569,6 +607,8 @@ end:
 }
 
 static int spockfs_mknod(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
 
         uint16_t mode_len = 0;
         char *mode = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_MODE", 17, &mode_len);
@@ -593,6 +633,8 @@ end:
 
 static int spockfs_chown(struct wsgi_request *wsgi_req, char *path) {
 
+	spockfs_check_readonly(wsgi_req);
+
         uint16_t uid_len = 0;
         char *uid = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_UID", 16, &uid_len);
         if (!uid) goto end;
@@ -614,6 +656,9 @@ end:
 }
 
 static int spockfs_rename(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
+
         char path2[PATH_MAX+1];
 
         uint16_t target_len = 0;
@@ -639,6 +684,9 @@ end:
 }
 
 static int spockfs_link(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
+
 	char path2[PATH_MAX+1];
 
         uint16_t target_len = 0;
@@ -664,6 +712,9 @@ end:
 }
 
 static int spockfs_symlink(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
+
 	char *path2 = NULL;
 
 	uint16_t target_len = 0;
@@ -687,6 +738,8 @@ end:
 
 static int spockfs_delete(struct wsgi_request *wsgi_req, char *path) {
 
+	spockfs_check_readonly(wsgi_req);
+
 	if (unlink(path)) {
 		spockfs_errno(wsgi_req);
                 goto end;
@@ -700,6 +753,8 @@ end:
 }
 
 static int spockfs_rmdir(struct wsgi_request *wsgi_req, char *path) {
+
+	spockfs_check_readonly(wsgi_req);
 
         if (rmdir(path)) {
                 spockfs_errno(wsgi_req);
@@ -985,26 +1040,36 @@ static int spockfs_init() {
 	return 0;
 }
 
+static void spockfs_mount(struct uwsgi_string_list *usl, long readonly) {
+	char *equal = strchr(usl->value, '=');
+        if (!equal || equal == (usl->value+usl->len)-1) {
+        	uwsgi_log("invalid spockfs mount syntax, must be <mountpoint>=<path>\n");
+                exit(1);
+	}
+        // pretty useless, just for statistics
+        time_t now = uwsgi_now();
+        int id = uwsgi_apps_cnt;
+        struct uwsgi_app *ua = uwsgi_add_app(id, spockfs_plugin.modifier1, usl->value, equal-usl->value, equal+1, (void *) usl->len - ((equal-usl->value)+1));
+        if (!ua) {
+        	uwsgi_log("[spockfs] unable to mount %.*s\n", equal-usl->value, usl->value);
+                exit(1);
+	}
+
+	ua->responder0 = (void *) readonly;
+
+        ua->started_at = now;
+        ua->startup_time = uwsgi_now() - now;
+        uwsgi_log("SpockFS%sapp/mountpoint %d (%.*s) loaded at %p for directory %.*s\n", readonly ? " readonly " : " ", id, equal-usl->value, usl->value, ua, usl->len - ((equal-usl->value)+1), equal+1);
+	uwsgi_emulate_cow_for_apps(id);
+}
+
 static void spockfs_apps() {
 	struct uwsgi_string_list *usl = NULL;
 	uwsgi_foreach(usl, spockfs.mountpoints) {
-		char *equal = strchr(usl->value, '=');
-		if (!equal || equal == (usl->value+usl->len)-1) {
-			uwsgi_log("invalid spockfs mount syntax, must be <mountpoint>=<path>\n");
-			exit(1);
-		}
-		// pretty useless, just for statistics
-		time_t now = uwsgi_now();
-		int id = uwsgi_apps_cnt;
-		struct uwsgi_app *ua = uwsgi_add_app(id, spockfs_plugin.modifier1, usl->value, equal-usl->value, equal+1, (void *) usl->len - ((equal-usl->value)+1));
-		if (!ua) {
-			uwsgi_log("[spockfs] unable to mount %.*s\n", equal-usl->value, usl->value);
-			exit(1);
-		}
-
-		ua->started_at = now;
-		ua->startup_time = uwsgi_now() - now;
-		uwsgi_log("SpockFS app/mountpoint %d (%.*s) loaded at %p for directory %.*s\n", id, equal-usl->value, usl->value, ua, usl->len - ((equal-usl->value)+1), equal+1);
+		spockfs_mount(usl, 0);
+	}
+	uwsgi_foreach(usl, spockfs.ro_mountpoints) {
+		spockfs_mount(usl, 1);
 	}
 }
 
