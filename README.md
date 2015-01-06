@@ -5,7 +5,7 @@ SpockFS is an HTTP based network filesystem
 
 It is built upon plain HTTP methods and headers (no XML, no XML and no XML) and supports all of the FUSE posix-related hooks (yes you can manage symlinks too).
 
-This page is mainly for Specs, if you only want to download a server and a client skip here: https://github.com/unbit/spockfs/blob/master/README.md#the-reference-fuse-client
+This page is mainly for Specs, if you only want to download a server and a client (for Linux, FreeBSD and OSX) jump here: https://github.com/unbit/spockfs/blob/master/README.md#the-reference-fuse-client
 
 SPECS 0.1
 =========
@@ -363,6 +363,50 @@ The client supports interruptions (you can interrupt stuck filesystem requests i
 
 The reference server implementation (uWSGI plugin)
 ==================================================
+
+The server-side official implementation is a uWSGI plugin (if you do not know what uWSGI is, simply consider it as the application server to run the spockfs server logic). In a LAN you can run uWSGI as standalone (with --http-socket option) while if you plan the expose the server on a public network you'd better to put uWSGI behind nginx, apache or the uWSGI http router.
+
+Albeit the plugin supports non-blocking/coroutine modes, they do not apply well to a storage server (disk i/o on Linux cannot be made 100% non-blocking) so a multithreaded/multiprocess (or both) approach is the best way to configure uWSGI.
+
+If you already use uWSGI you can build the plugin in one shot with:
+
+```sh
+uwsgi --build-plugin https://github.com/unbit/spockfs
+```
+
+this will result with the spockfs_plugin.so in the current directory.
+
+Instead, if you do not use/have uWSGI you can build a single binary with the spockfs plugin embedded in it, with a single command again (just be sure to have gcc, python and libpcre to build it):
+
+```sh
+curl https://uwsgi.it/install.sh | UWSGI_EMBED_PLUGINS="spockfs=https://github.com/unbit/spockfs" bash -s nolang /tmp/spockfs-server
+```
+
+this will result in the /tmp/spockfs-server binary (that is a uWSGI server + spockfs plugin)
+
+Now you can run the server. If you choosen the plugin approach (the first described):
+
+```sh
+uwsgi --plugin 0:spockfs --http-socket :9090 --threads 8 --spockfs-mount /=/var/www
+```
+
+this will bind uWSGI to http port 9090 with 8 threads ready to answer for spockfs requests that will be mapped to /var/www (read: a /foo request will map to /var/www/foo)
+
+If you have built the /tmp/spockfs-server binary the syntax will be a little shorter:
+
+```sh
+/tmp/spockfs-server --http-socket :9090 --threads 8 --spockfs-mount /=/var/www
+```
+
+This is enough to run a LAN server, for more informations and examples check the spockfs uWSGI plugin documentation here: https://github.com/unbit/spockfs/tree/master/uwsgi/README.md
+
+
+Project Status
+==============
+
+Version 0.1 of the SPECS is complete, the 0.2 version should fix the items listed in the SPECS Todo section.
+
+Both the reference/official server and client fully support the 0.1 SPECS and run on Linux, FreeBSD ans OSX
 
 Why ?
 =====
