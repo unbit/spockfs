@@ -92,7 +92,7 @@ Errors are managed with this simple http_code->errno mapping:
 * 409 Conflict -> EEXIST
 * 412 Precondition Failed -> ENOTEMPTY
 * 413 Request Entity Too Large -> ERANGE
-* 415 Unsupported Media Type -> ENODATA
+* 415 Unsupported Media Type -> ENODATA/ENOATTR
 * 500 Internal Server Error -> EIO (default error)
 
 Authentication/Authorization/Crypto
