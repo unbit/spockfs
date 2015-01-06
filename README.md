@@ -187,6 +187,25 @@ X-Spock-ino: 106280423
 
 the values of the headers map 1:1 with the POSIX `struct stat` fields
 
+curl example:
+
+```sh
+$ curl -X GETATTR -D /dev/stdout http://host:port/
+HTTP/1.1 200 OK
+X-Spock-mode: 16877
+X-Spock-uid: 1000
+X-Spock-gid: 1000
+X-Spock-size: 4096
+X-Spock-mtime: 1420489499
+X-Spock-atime: 1420499434
+X-Spock-ctime: 1420489499
+X-Spock-nlink: 5
+X-Spock-blocks: 8
+X-Spock-dev: 2049
+X-Spock-ino: 459840
+Content-Length: 0
+```
+
 WSGI example
 
 ```python
@@ -283,6 +302,26 @@ FALLOCATE
 
 STATFS
 ------
+
+curl example:
+
+```sh
+$ curl -X STATFS -D /dev/stdout http://host:port/
+HTTP/1.1 200 OK
+X-Spock-bsize: 4096
+X-Spock-frsize: 4096
+X-Spock-blocks: 5006245
+X-Spock-bfree: 306563
+X-Spock-bavail: 79344
+X-Spock-files: 1286144
+X-Spock-ffree: 499225
+X-Spock-favail: 499225
+X-Spock-fsid: 16569270516359368890
+X-Spock-flag: 4096
+X-Spock-namemax: 255
+Content-Length: 0
+
+```
 
 LISTXATTR
 ---------
