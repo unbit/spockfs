@@ -130,7 +130,7 @@ file002
 curl example:
 
 ```sh
-curl -X READDIR -D /dev/stdout http://host:port/
+$ curl -X READDIR -D /dev/stdout http://host:port/
 HTTP/1.1 200 OK
 Content-Length: 21
 
