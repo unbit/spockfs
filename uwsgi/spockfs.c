@@ -6,10 +6,6 @@
 #include <sys/xattr.h>
 #endif
 
-#ifdef __FreeBSD__
-int fallocate(int fd, int mode, off_t offset, off_t len);
-#endif
-
 extern struct uwsgi_server uwsgi;
 
 struct uwsgi_plugin spockfs_plugin;
@@ -183,7 +179,7 @@ end:
 }
 
 
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__FreeBSD__)
 static int spockfs_fallocate(struct wsgi_request *wsgi_req, char *path) {
 
 	spockfs_check_readonly(wsgi_req);
@@ -1011,7 +1007,7 @@ static int spockfs_request(struct wsgi_request *wsgi_req) {
 		return spockfs_truncate(wsgi_req, path);
 	}
 
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__FreeBSD__)
 	if (!uwsgi_strncmp(wsgi_req->method, wsgi_req->method_len, "FALLOCATE", 9)) {
 		return spockfs_fallocate(wsgi_req, path);
 	}
