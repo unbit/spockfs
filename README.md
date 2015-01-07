@@ -620,7 +620,7 @@ Unbit is already developing an high performance 9p network filesystem server (ht
 
 Finally, after having worked/developed the https://github.com/unbit/davvy project (a WebDAV/CalDAV/CardDAV django implementation) i came up with the conclusion that i will never touch again any WebDAV-related thing. Seriously.
 
-Why Spock ?
-===========
+Why 'Spock' ?
+=============
 
 Why not ? Instead of using cryptozoological animals or musicians names (or acronyms, like my company generally does) this time i want to make a tribute to the best figure of The United Federation of Planets 
