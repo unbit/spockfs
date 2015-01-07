@@ -2,6 +2,10 @@
 
 #include <sys/statvfs.h>
 
+#ifdef __APPLE__
+#include <sys/xattr.h>
+#endif
+
 extern struct uwsgi_server uwsgi;
 
 struct uwsgi_plugin spockfs_plugin;
@@ -159,6 +163,7 @@ end:
 }
 
 
+#ifndef __APPLE__
 static int spockfs_fallocate(struct wsgi_request *wsgi_req, char *path) {
 
 	uint16_t mode_len = 0;
@@ -183,6 +188,7 @@ end:
 end2:
         return UWSGI_OK;
 }
+#endif
 
 /*
 	unfortunately uWSGI does not expose an api for content-range.
@@ -277,7 +283,11 @@ static int spockfs_listxattr(struct wsgi_request *wsgi_req, char *path) {
 
 	// special condition: get the size of the required buffer
 	if (mem == 0) {
+#ifndef __APPLE__
 		ssize_t rlen = llistxattr(path, NULL, 0);
+#else
+		ssize_t rlen = listxattr(path, NULL, 0, XATTR_NOFOLLOW);
+#endif
         	if (rlen < 0) {
                 	spockfs_errno(wsgi_req);
                 	goto end;
@@ -296,7 +306,11 @@ static int spockfs_listxattr(struct wsgi_request *wsgi_req, char *path) {
 
 	buf = uwsgi_malloc(mem);
 
+#ifndef __APPLE__
 	ssize_t rlen = llistxattr(path, buf, mem);
+#else
+	ssize_t rlen = listxattr(path, buf, mem, XATTR_NOFOLLOW);
+#endif
 	if (rlen < 0) {
 		spockfs_errno(wsgi_req);
                 goto end;
@@ -338,7 +352,11 @@ static int spockfs_getxattr(struct wsgi_request *wsgi_req, char *path) {
 
         // special condition: get the size of the required buffer
         if (mem == 0) {
+#ifndef __APPLE__
                 ssize_t rlen = lgetxattr(path, name, NULL, 0);
+#else
+                ssize_t rlen = getxattr(path, name, NULL, 0, 0, XATTR_NOFOLLOW);
+#endif
                 if (rlen < 0) {
                         spockfs_errno(wsgi_req);
                         goto end;
@@ -358,7 +376,11 @@ static int spockfs_getxattr(struct wsgi_request *wsgi_req, char *path) {
 
         buf = uwsgi_malloc(mem);
 
+#ifndef __APPLE__
         ssize_t rlen = lgetxattr(path, name, buf, mem);
+#else
+        ssize_t rlen = getxattr(path, name, buf, mem, 0, XATTR_NOFOLLOW);
+#endif
         if (rlen < 0) {
                 spockfs_errno(wsgi_req);
                 goto end;
@@ -391,13 +413,21 @@ static int spockfs_utimens(struct wsgi_request *wsgi_req, char *path) {
         char *mtime = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_MTIME", 18, &mtime_len);
         if (!mtime) goto end;
 
+#ifndef __APPLE__
 	struct timespec tv[2];
 	tv[0].tv_sec = uwsgi_str_num(atime, atime_len);
 	tv[0].tv_nsec = 0;	
 	tv[1].tv_sec = uwsgi_str_num(mtime, mtime_len);
 	tv[1].tv_nsec = 0;	
-
 	if (futimens(fd, tv)) {
+#else
+	struct timeval tv[2];
+	tv[0].tv_sec = uwsgi_str_num(atime, atime_len);
+	tv[0].tv_usec = 0;	
+	tv[1].tv_sec = uwsgi_str_num(mtime, mtime_len);
+	tv[1].tv_usec = 0;	
+	if (futimes(fd, tv)) {
+#endif
 		spockfs_errno(wsgi_req);
                 goto end;
 	}
@@ -436,7 +466,11 @@ static int spockfs_setxattr(struct wsgi_request *wsgi_req, char *path) {
 	ssize_t body_len = 0;
 	char *body = uwsgi_request_body_read(wsgi_req, wsgi_req->post_cl , &body_len);
 
+#ifndef __APPLE__
         if (lsetxattr(path, name, body, body_len, uwsgi_str_num(flag, flag_len))) {
+#else
+        if (setxattr(path, name, body, body_len, 0, XATTR_NOFOLLOW | uwsgi_str_num(flag, flag_len))) {
+#endif
                 spockfs_errno(wsgi_req);
                 goto end;
         }
@@ -459,7 +493,11 @@ static int spockfs_removexattr(struct wsgi_request *wsgi_req, char *path) {
 
         name = uwsgi_concat2n(target, target_len, "", 0);
 
+#ifndef __APPLE__
         if (lremovexattr(path, name)) {
+#else
+        if (removexattr(path, name, XATTR_NOFOLLOW)) {
+#endif
                 spockfs_errno(wsgi_req);
                 goto end;
         }
@@ -905,9 +943,11 @@ static int spockfs_request(struct wsgi_request *wsgi_req) {
 		return spockfs_truncate(wsgi_req, path);
 	}
 
+#ifndef __APPLE__
 	if (!uwsgi_strncmp(wsgi_req->method, wsgi_req->method_len, "FALLOCATE", 9)) {
 		return spockfs_fallocate(wsgi_req, path);
 	}
+#endif
 
 	if (!uwsgi_strncmp(wsgi_req->method, wsgi_req->method_len, "STATFS", 6)) {
 		return spockfs_statfs(wsgi_req, path);
