@@ -100,6 +100,28 @@ Authentication/Authorization/Crypto
 
 Security should be managed at the webserver level (nginx, apache, uWSGI, whatever you use), but you are free to extend you server-side app to support HTTP-related security techiques (just ensure the client supports them)
 
+Sanitizing paths
+================
+
+Client and server should work with absolute paths (as FUSE does). You need to sanitize paths in the server as you cannot be sure a FUSE-compliant client will connect.
+
+The steps to validate a paths are easy:
+
+* ensure every resource starts with /
+* ensure the resource does NOT contain /../ and /./
+* ensure the resource does NOT end with /.. and /.
+
+So
+
+/foo/bar is valid
+
+while
+
+/foo/bar/../bar is not
+
+Methods specifications
+======================
+
 READDIR
 -------
 
