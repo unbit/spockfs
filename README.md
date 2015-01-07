@@ -122,7 +122,9 @@ while
 Methods specifications
 ======================
 
-The following table (maps 1:1 with POSIX) will be useful when building mode/flag headers:
+The following tables (maps 1:1 with POSIX) will be useful when building headers:
+
+"mode" flags
 
 |POSIX|int|hex|oct|
 |-----|---|---|---|
@@ -145,6 +147,22 @@ The following table (maps 1:1 with POSIX) will be useful when building mode/flag
 |S_IROTH|4|0x4|04|
 |S_IWOTH|2|0x2|02|
 |S_IXOTH|1|0x1|01|
+
+"open" flags
+
+|POSIX|int|hex|oct|
+|-----|---|---|---|
+|O_RDONLY|0|0x0|00|
+|O_WRONLY|1|0x1|01|
+|O_RDWR|2|0x2|02|
+
+"access" flags
+
+|POSIX|int|hex|oct|
+|-----|---|---|---|
+|R_OK|4|0x4|04|
+|W_OK|2|0x2|02|
+|X_OK|1|0x1|01|
 
 READDIR
 -------
