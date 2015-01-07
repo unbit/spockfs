@@ -291,6 +291,14 @@ Note: this will probably never success if you run your server over a true filesy
 TRUNCATE
 --------
 
+FUSE hook: truncate
+
+X-Spock headers used: X-Spock-size
+
+Expected status: 200 OK on success
+
+truncate/resize a file to size specified by X-Spock-size header
+
 ACCESS
 ------
 
@@ -300,8 +308,24 @@ SYMLINK
 READLINK
 --------
 
+FUSE hook: readlink
+
+X-Spock headers used: none
+
+Expected status: 200 OK on success
+
+Returns the target of a symlink as the HTTP body.
+
 RMDIR
 -----
+
+FUSE hook: rmdir
+
+X-Spock headers used: none
+
+Expected status: 200 OK on success
+
+Remove a directory (must be empty)
 
 MKDIR
 -----
@@ -311,6 +335,29 @@ LINK
 
 RENAME
 ------
+
+FUSE hook: rename
+
+X-Spock headers used: X-Spock-target
+
+Expected status: 200 OK on success
+
+Rename the object specified in X-Spock-target header with the resource name
+
+raw HTTP example
+
+```
+RENAME /foobar/deimos HTTP/1.1
+Host: example.com
+X-Spock-target: /foobar/kratos
+
+HTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
+this renames /foobar/kratos to /foobar/deimos
+
 
 FALLOCATE
 ---------
@@ -352,6 +399,30 @@ REMOVEXATTR
 
 UTIMENS
 -------
+
+FUSE hook: utimens
+
+X-Spock headers used: X-Spock-atime, X-Spock-mtime
+
+Expected status: 200 OK on success
+
+Update access and modification times of an object
+
+raw HTTP example:
+
+```
+UTIMENS /foobar/deimos HTTP/1.1
+Host: example.com
+X-Spock-atime: 1
+X-Spock-mtime: 1
+
+HTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
+this set atime and mtime of /foobar/deimos to the first second of 1 Jan 1970
+
 
 POST
 ----
@@ -460,6 +531,19 @@ Define an api for the POLL feature (if we find some useful usage for it)
 
 Define an api for the IOCTL feature.
 
+Investigate gzip compression implications.
+
+Suggestions on how to use Keep-alive
+
+
+Performance
+===========
+
+HTTP is obviously pretty verbose (at the packet level) so comparing SpockFS with NFS or 9P is unfair. WebDAV should be a better candidate for a comparison and SpockFS is obviously way simpler and faster. In addition to this, modern HTTP parsing techiques are super-optimized (thanks to projects like nginx).
+
+FUSE is often considered suboptimal from a performance point of view, but allowed fast development of a working implementations with lot of interesting features (at this stage, reliability is way more important than high-performance).
+
+The reference/official client and server are heavily optimized (and more work can be done in this area) so you should have a pretty comfortable experience when working with your shell over a SpockFS mount.
 
 
 The reference FUSE client
@@ -479,7 +563,7 @@ as an example to mount an url under /mnt/foobar
 ./spockfs https://foo:bar@example.com/mydisk /mnt/foobar
 ```
 
-The client supports interruptions (you can interrupt stuck filesystem requests in the middle), dns caching (every result is cached for 60 seconds) and is fully thread-safe. Every operation has a 30 seconds timeout, after which EIO is returned. High-availability is easy affordable as every operation is stateless, and in case of a malfunctioning server the filesystem will return back to full operation mode as soon as the server is back (in the mean time EIO is returned). The default 60 seconds TTL for dns cache allows easy 'failover' of nodes.
+The client supports interruptions (you can interrupt stuck filesystem requests in the middle), dns caching (every result is cached for 60 seconds) and is fully thread-safe. Every operation has a 30 seconds timeout, after which EIO is returned. High-availability is easy affordable as every operation is stateless, and in case of a malfunctioning server the filesystem will return back to fully operational mode as soon as the server is back (in the mean time EIO is returned). The default 60 seconds TTL for dns cache allows easy 'failover' of nodes.
 
 
 The reference server implementation (uWSGI plugin)
