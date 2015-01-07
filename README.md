@@ -320,7 +320,7 @@ Content-Length: 0
 
 ```
 
-The X-Spock-mode value (octal: 010600) is built as `stat.S_IFIFO | stat.S_IWUSR|stat.S_IRUSR` (so a fifo with 600 permissions). The dev value is left as 0 as it is not used.
+The X-Spock-mode value (octal: 010600) is built as `S_IFIFO|S_IRUSR|S_IRUSR` (so a fifo with 600 permissions). The dev value is left as 0 as it is not used.
 
 OPEN
 ----
@@ -330,6 +330,8 @@ FUSE hook: open
 X-Spock headers used: X-Spock-flag
 
 Expected status: 200 OK on success
+
+This is only a "check" for permission on a file as all of the spockfs operations are stateless.
 
 
 CHMOD
@@ -367,8 +369,26 @@ truncate/resize a file to size specified by X-Spock-size header
 ACCESS
 ------
 
+FUSE hook: access
+
+X-Spock headers used: X-Spock-mode
+
+Expected status: 200 OK on success
+
+Very similar to open from a low-level point of view. Albeit the header is called mode, it does not take the stat() mode value but R_OK, W_OK, X_OK flags (the 'mode' name is used in respect to POSIX definition)
+
+
 SYMLINK
 -------
+
+FUSE hook: symlink
+
+X-Spock headers used: X-Spock-target
+
+Expected status: 201 Created on success
+
+Create a new symlink pointing to the X-Spock-target header value
+
 
 READLINK
 --------
@@ -395,8 +415,25 @@ Remove a directory (must be empty)
 MKDIR
 -----
 
+FUSE hook: mdir
+
+X-Spock headers used: X-Spock-mode
+
+Expected status: 201 Created
+
+Create a new directory
+
 LINK
 ----
+
+FUSE hook: link
+
+X-Spock headers used: X-Spock-target
+
+Expected status: 201 Created on success
+
+Create a new hardlink pointing to the X-Spock-target header value
+
 
 RENAME
 ------
@@ -426,6 +463,9 @@ this renames /foobar/kratos to /foobar/deimos
 
 FALLOCATE
 ---------
+
+(Currently Linux only)
+
 
 STATFS
 ------
