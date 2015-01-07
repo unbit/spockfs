@@ -32,6 +32,9 @@ The following options are exposed by the plugin
 Serving directories
 ===================
 
+Concurrency
+===========
+
 Placing behind nginx
 ====================
 
