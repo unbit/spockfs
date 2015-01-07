@@ -6,6 +6,10 @@
 #include <sys/xattr.h>
 #endif
 
+#ifdef __FreeBSD__
+int fallocate(int fd, int mode, off_t offset, off_t len);
+#endif
+
 extern struct uwsgi_server uwsgi;
 
 struct uwsgi_plugin spockfs_plugin;
@@ -77,7 +81,12 @@ static void spockfs_errno(struct wsgi_request *wsgi_req) {
                 case ERANGE:
                 	uwsgi_response_prepare_headers(wsgi_req, "413 Request Entity Too Large", 28);
 			break;
+#ifdef ENODATA
                 case ENODATA:
+#endif
+#ifdef ENOATTR
+                case ENOATTR:
+#endif
                 	uwsgi_response_prepare_headers(wsgi_req, "415 Unsupported Media Type", 26);
 			break;
                 default:
@@ -292,6 +301,7 @@ end:
         return UWSGI_OK;
 }
 
+#ifndef __FreeBSD__
 static int spockfs_listxattr(struct wsgi_request *wsgi_req, char *path) {
 	char *buf = NULL;
 
@@ -416,6 +426,7 @@ end:
         if (buf) free(buf);
         return UWSGI_OK;
 }
+#endif
 
 static int spockfs_utimens(struct wsgi_request *wsgi_req, char *path) {
 
@@ -435,7 +446,7 @@ static int spockfs_utimens(struct wsgi_request *wsgi_req, char *path) {
         char *mtime = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_MTIME", 18, &mtime_len);
         if (!mtime) goto end;
 
-#ifndef __APPLE__
+#if !defined( __APPLE__) && !defined(__FreeBSD__)
 	struct timespec tv[2];
 	tv[0].tv_sec = uwsgi_str_num(atime, atime_len);
 	tv[0].tv_nsec = 0;	
@@ -464,6 +475,7 @@ end2:
 
 }
 
+#ifndef __FreeBSD__
 static int spockfs_setxattr(struct wsgi_request *wsgi_req, char *path) {
 
 	spockfs_check_readonly(wsgi_req);
@@ -537,6 +549,7 @@ end:
         if (name) free(name);
         return UWSGI_OK;
 }
+#endif
 
 static int spockfs_open(struct wsgi_request *wsgi_req, char *path) {
 
@@ -1008,6 +1021,7 @@ static int spockfs_request(struct wsgi_request *wsgi_req) {
 		return spockfs_statfs(wsgi_req, path);
 	}
 
+#ifndef __FreeBSD__
 	if (!uwsgi_strncmp(wsgi_req->method, wsgi_req->method_len, "LISTXATTR", 9)) {
 		return spockfs_listxattr(wsgi_req, path);
 	}
@@ -1023,6 +1037,7 @@ static int spockfs_request(struct wsgi_request *wsgi_req) {
 	if (!uwsgi_strncmp(wsgi_req->method, wsgi_req->method_len, "REMOVEXATTR", 11)) {
 		return spockfs_removexattr(wsgi_req, path);
 	}
+#endif
 
 	if (!uwsgi_strncmp(wsgi_req->method, wsgi_req->method_len, "UTIMENS", 7)) {
 		return spockfs_utimens(wsgi_req, path);
