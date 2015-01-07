@@ -122,6 +122,30 @@ while
 Methods specifications
 ======================
 
+The following table (maps 1:1 with POSIX) will be useful when building mode/flag headers:
+
+|POSIX|int|hex|oct|
+|-----|---|---|---|
+|S_IFREG|32768|0x8000|0100000|
+|S_IFCHR|8192|0x2000|020000|
+|S_IFBLK|24576|0x6000|060000|
+|S_IFIFO|4096|0x1000|010000|
+|S_IFSOCK|49152|0xc000|0140000|
+|S_IFDIR|16384|0x4000|040000|
+|S_IFLNK|40960|0xa000|0120000|
+|S_ISUID|2048|0x800|04000|
+|S_ISGID|1024|0x400|02000|
+|S_ISVTX|512|0x200|01000|
+|S_IRUSR|256|0x100|0400|
+|S_IWUSR|128|0x80|0200|
+|S_IXUSR|64|0x40|0100|
+|S_IRGRP|32|0x20|040|
+|S_IWGRP|16|0x10|020|
+|S_IXGRP|8|0x8|010|
+|S_IROTH|4|0x4|04|
+|S_IWOTH|2|0x2|02|
+|S_IXOTH|1|0x1|01|
+
 READDIR
 -------
 
@@ -263,6 +287,7 @@ X-Spock headers used: X-Spock-mode, X-Spock-dev
 Expected status: 201 Created on success
 
 This is the mknod() POSIX function, you can use it for creating fifos, devices and so on (well, even regular files ...)
+
 
 raw HTTP example:
 
