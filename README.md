@@ -76,7 +76,7 @@ The following ones are for statvfs() calls, they map 1:1 with the stavfs struct,
 * X-Spock-namemax
 
 
-Finally this two "standard" headers are used:
+Finally this three "standard" headers are used:
 
 * Content-Length (required for every HTTP/1.1 response)
 * Range (for GET and FALLOCATE methods)
