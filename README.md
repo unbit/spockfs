@@ -56,10 +56,10 @@ The following ones are for stat()-related operations:
 * X-Spock-mtime (the modification time in unix time)
 * X-Spock-atime (the access time in unix time)
 * X-Spock-ctime (the creation time in unix time)
-* X-Spock-nlink (the number of links)
-* X-Spock-blocks (the number of blocks)
+* X-Spock-nlink (the number of links of an object)
+* X-Spock-blocks (the number of blocks os an object)
 * X-Spock-dev (the device id)
-* X-Spock-ino (the inode number)
+* X-Spock-ino (the inode number, unused by default in FUSE)
 * X-Spock-flag (generic flag, used by open() too)
 * X-Spock-target (generic string used for symlink values, rename operations and for the names of extended attributes)
 
@@ -76,7 +76,7 @@ The following ones are for statvfs() calls, they map 1:1 with the stavfs struct,
 * X-Spock-namemax
 
 
-Finally this three "standard" headers are used:
+Finally these three "standard" headers are used:
 
 * Content-Length (required for every HTTP/1.1 response)
 * Range (for GET and FALLOCATE methods)
