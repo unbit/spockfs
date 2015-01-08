@@ -760,7 +760,7 @@ The client supports interruptions (you can interrupt stuck filesystem requests i
 The reference server implementation (uWSGI plugin)
 ==================================================
 
-The server-side official implementation is a uWSGI plugin (if you do not know what uWSGI is, simply consider it as the application server to run the spockfs server logic). In a LAN you can run uWSGI as standalone (with --http-socket option) while if you plan the expose the server on a public network you'd better to put uWSGI behind nginx, apache or the uWSGI http router.
+The server-side official implementation is a uWSGI plugin (if you do not know what uWSGI is, simply consider it as the application server to run the spockfs server logic). In a LAN you can run uWSGI as standalone (with --http-socket option) while if you plan to expose the server on a public network you'd better to put uWSGI behind nginx, apache or the uWSGI http router.
 
 Albeit the plugin supports non-blocking/coroutine modes, they do not apply well to a storage server (disk i/o on Linux cannot be made 100% non-blocking) so a multithreaded/multiprocess (or both) approach is the best way to configure uWSGI.
 
@@ -780,7 +780,7 @@ curl https://uwsgi.it/install.sh | UWSGI_EMBED_PLUGINS="spockfs=https://github.c
 
 this will result in the /tmp/spockfs-server binary (that is a uWSGI server + spockfs plugin)
 
-Now you can run the server. If you choosen the plugin approach (the first described):
+Now you can run the server. If you choose the plugin approach (the first described):
 
 ```sh
 uwsgi --plugin 0:spockfs --http-socket :9090 --threads 8 --spockfs-mount /=/var/www
