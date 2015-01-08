@@ -278,3 +278,87 @@ stats = 127.0.0.1:9091
 
 Playing with internal routing
 =============================
+
+Internal routing (http://uwsgi-docs.readthedocs.org/en/latest/InternalRouting.html) is one of the most advanced uWSGI features, consider it as a meta-language for changing the request/response cycle at runtime. For apache users, see it as a more powerful mod_rewrite.
+
+You can use it for enforcing special rules for every SpockFS request. As an example you may want to reject any request from hosts starting with address 10.*:
+
+```ini
+[uwsgi]
+plugin = spockfs
+http-socket = :9090
+spockfs-mount = /=/var/www
+
+route-remote-addr = ^/10\. break:403 Forbidden
+```
+
+or you can change the resource requested to implement aliasing
+
+```ini
+[uwsgi]
+plugin = spockfs
+http-socket = :9090
+spockfs-mount = /=/var/www
+
+route = ^/foobar$ setpathinfo:/thetrueone
+```
+
+or enforce specific behaviours to authenticated users
+
+```ini
+[uwsgi]
+plugin = spockfs
+http-socket = :9090
+spockfs-mount = /=/var/www
+
+; always returns 404 to the kratos user
+route-remote-user = ^kratos$ break:404 Not Found
+```
+
+Internal routing allows basic authentication too, the following one is a simple hardcoded session
+
+```ini
+[uwsgi]
+; load the spockfs plugin (if needed by your build)
+plugin = spockfs
+; again, useless in monolithic builds, or those installed via the network installer
+plugin = router_basicauth
+
+http-socket = :9090
+spockfs-mount = /=/var/www
+
+; route-run will force a route to always run without conditions
+route-run = basicauth:SpockFS realm,kratos:deimos
+```
+
+another example using radius (requires uWSGI radius plugin)
+
+```ini
+[uwsgi]
+; load the spockfs plugin (if needed by your build)
+plugin = spockfs
+; the radius plugin is generally not built in official uWSGI installers, so you need to load it
+plugin = router_radius
+
+http-socket = :9090
+spockfs-mount = /=/var/www
+
+; route-run will force a route to always run without conditions
+route-run = radius:realm=SpockFS,server=192.168.173.17:1703,secret=unknown
+```
+
+or ldap (requires uWSGI ldap plugin)
+
+```ini
+[uwsgi]
+; load the spockfs plugin (if needed by your build)
+plugin = spockfs
+; the radius plugin is generally not built in official uWSGI installers, so you need to load it
+plugin = router_radius
+
+http-socket = :9090
+spockfs-mount = /=/var/www
+
+; route-run will force a route to always run without conditions
+route-run = ldapauth:url=ldaps://192.168.173.22:3030/,binddn=cn=foobar,bindpw=unknown
+```
