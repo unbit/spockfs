@@ -921,9 +921,9 @@ Both the reference/official server and client fully support the 0.1 SPECS and ru
 Why ?
 =====
 
-Unbit is already developing an high performance 9p network filesystem server (https://github.com/unbit/9spock), but during development we came up with this really simple (and working) implementation. You can build a server really fast and over battle-tested technologies (nginx, apache, uWSGI ...) and web frameworks.
+Unbit is already developing an high performance 9p network filesystem server (https://github.com/unbit/9spock), but during development we came up with this really simple (and working) implementation. You can build a server really fast and over battle-tested technologies (nginx, apache, uWSGI ...) and web stacks (PSGI, WSGI, Rack ...).
 
-Finally, after having worked/developed the https://github.com/unbit/davvy project (a WebDAV/CalDAV/CardDAV django implementation) i came up with the conclusion that i will never touch again any WebDAV-related thing. Seriously.
+Finally, after having worked/developed the https://github.com/unbit/davvy project (a WebDAV/CalDAV/CardDAV django implementation) and the (always-in-unstable-state) WebDAV uWSGI plugin, i came up with the conclusion that i will never touch again any WebDAV-related thing. Seriously.
 
 Why 'Spock' ?
 =============
