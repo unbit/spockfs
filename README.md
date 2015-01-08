@@ -377,6 +377,19 @@ Expected status: 200 OK on success
 
 Very similar to open from a low-level point of view. Albeit the header is called mode, it does not take the stat() mode value but R_OK, W_OK, X_OK flags (the 'mode' name is used in respect to POSIX definition)
 
+raw HTTP example
+
+```
+ACCESS /am_i_writable HTTP/1.1
+Host: example.com
+X-Spock-mode: 2
+
+HTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
+this will check if /am_i_writable is writable (W_OK = 2)
 
 SYMLINK
 -------
@@ -389,6 +402,17 @@ Expected status: 201 Created on success
 
 Create a new symlink pointing to the X-Spock-target header value
 
+```
+SYMLINK /i_am_a_link HTTP/1.1
+Host: example.com
+X-Spock-target: /opt/foobar
+
+HTTP/1.1 201 Created
+Content-Length: 0
+
+```
+
+will create the symlink 'i_am_a_link' pointing to '/opt/foobar'
 
 READLINK
 --------
@@ -466,6 +490,16 @@ FALLOCATE
 
 (Currently Linux only)
 
+FUSE hook: fallocate
+
+X-Spock headers used: X-Spock-mode
+
+Standard headers used: Range
+
+Expected status: 200 OK on success
+
+This method physically "pre-allocates" blocks for the specified file. It is generally used for performance reasons and it is currently a Linux-only call.
+
 
 STATFS
 ------
@@ -492,6 +526,28 @@ Content-Length: 0
 
 LISTXATTR
 ---------
+
+FUSE hook: listxattr
+
+X-Spock headers used: node
+
+Expected status: 200 OK on success
+
+Returns the list of extended attributes names for a resource. The format is the same of READDIR (each name separated by a newline)
+
+raw HTTP example
+
+```
+LISTXATTR /foobar HTTP/1.1
+Host: example.com
+
+HTTP/1.1 200 OK
+Content-Length: 18
+
+user.foo
+user.bar
+```
+
 
 GETXATTR
 --------
