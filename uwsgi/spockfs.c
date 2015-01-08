@@ -171,7 +171,7 @@ static int spockfs_access(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
         }
 
-        uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6);
+        if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
         uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -199,7 +199,7 @@ static int spockfs_fallocate(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
         }
 
-	uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6);
+	if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 end:
 	close(fd);
@@ -246,7 +246,7 @@ static int spockfs_put(struct wsgi_request *wsgi_req, char *path) {
                 if (write(fd, body, body_len) != body_len) goto end;
         }
 
-        uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6);
+        if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 end:
 	close(fd);
@@ -267,7 +267,7 @@ static int spockfs_mkdir(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
         }
 
-        uwsgi_response_prepare_headers(wsgi_req, "201 Created", 11);
+        if (uwsgi_response_prepare_headers(wsgi_req, "201 Created", 11)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -290,7 +290,7 @@ static int spockfs_post(struct wsgi_request *wsgi_req, char *path) {
         }
 	close(fd);
 
-        uwsgi_response_prepare_headers(wsgi_req, "201 Created", 11);
+        if (uwsgi_response_prepare_headers(wsgi_req, "201 Created", 11)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -588,7 +588,7 @@ static int spockfs_truncate(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
         }
 
-        uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6);
+        if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
         uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -608,7 +608,7 @@ static int spockfs_chmod(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
         }
 
-        uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6);
+        if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
         uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -632,7 +632,7 @@ static int spockfs_mknod(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
         }
 
-        uwsgi_response_prepare_headers(wsgi_req, "201 Created", 11);
+        if (uwsgi_response_prepare_headers(wsgi_req, "201 Created", 11)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -657,7 +657,7 @@ static int spockfs_chown(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
         }
 
-        uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6);
+        if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -685,7 +685,7 @@ static int spockfs_rename(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
         }
 
-        uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6);
+        if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -713,7 +713,7 @@ static int spockfs_link(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
         }
 
-        uwsgi_response_prepare_headers(wsgi_req, "201 Created", 11);
+        if (uwsgi_response_prepare_headers(wsgi_req, "201 Created", 11)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -737,7 +737,7 @@ static int spockfs_symlink(struct wsgi_request *wsgi_req, char *path) {
 		goto end;
 	}
 
-	uwsgi_response_prepare_headers(wsgi_req, "201 Created", 11);
+	if (uwsgi_response_prepare_headers(wsgi_req, "201 Created", 11)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -754,7 +754,7 @@ static int spockfs_delete(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
 	}
 
-	uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6);
+	if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
@@ -770,7 +770,7 @@ static int spockfs_rmdir(struct wsgi_request *wsgi_req, char *path) {
                 goto end;
         }
 
-        uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6);
+        if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
 end:
