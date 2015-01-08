@@ -169,6 +169,14 @@ The following tables (maps 1:1 with POSIX) will be useful when building headers:
 |W_OK|2|0x2|02|
 |X_OK|1|0x1|01|
 
+"xattr" flags
+
+|POSIX|int|hex|oct|
+|-----|---|---|---|
+|XATTR_CREATE|1|0x1|01|
+|XATTR_REPLACE|2|0x2|02|
+
+
 READDIR
 -------
 
@@ -344,7 +352,7 @@ X-Spock headers used: X-Spock-flag
 
 Expected status: 200 OK on success
 
-This is only a "check" for permission on a file as all of the spockfs operations are stateless.
+This is only a "check" for permissions on a file as all of the spockfs operations are stateless.
 
 raw HTTP example
 
@@ -370,6 +378,21 @@ X-Spock headers used: X-Spock-mode
 
 Expected status: 200 OK on success
 
+Change permissions on the specified resource. X-Spock-mode is the stat() mode field.
+
+raw HTTP example
+
+```
+CHMOD /writable_for_all HTTP/1.1
+Host: example.com
+X-Spock-mode: 438
+
+HTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
+438 is given by (256 | 128 | 32 | 16 | 4 | 2) octal 0666 or `S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH`
 
 CHOWN
 -----
@@ -394,6 +417,8 @@ HTTP/1.1 200 OK
 Content-Length: 0
 
 ```
+
+Note: always use numeric uid/gid
 
 TRUNCATE
 --------
@@ -477,6 +502,8 @@ Content-Length: 0
 
 will create the symlink 'i_am_a_link' pointing to '/opt/foobar'
 
+Note: the target object can be non-existent, this is not a problem
+
 READLINK
 --------
 
@@ -511,6 +538,17 @@ Expected status: 200 OK on success
 
 Remove a directory (must be empty)
 
+raw HTTP example
+
+```
+RMDIR /foobar HTTP/1.1
+Host: example.com
+
+HTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
 MKDIR
 -----
 
@@ -520,7 +558,22 @@ X-Spock headers used: X-Spock-mode
 
 Expected status: 201 Created
 
-Create a new directory
+Create a new directory, X-Spock-mode is the stat() mode (like CHMOD)
+
+raw HTTP example
+
+```
+MKDIR /foobar/test HTTP/1.1
+Host: example.com
+X-Spock-mode: 448
+
+HTTP/1.1 201 Created
+Content-Length: 0
+
+```
+
+X-Spock-mode is (256 | 128 | 64) octal (0700) or `S_IRUSR|S_IWUSR|S_IXUSR`
+
 
 LINK
 ----
@@ -532,6 +585,19 @@ X-Spock headers used: X-Spock-target
 Expected status: 201 Created on success
 
 Create a new hardlink pointing to the X-Spock-target header value
+
+
+```
+LINK /i_am_a_hardlink HTTP/1.1
+Host: example.com
+X-Spock-target: /opt/foobar
+
+HTTP/1.1 201 Created
+Content-Length: 0
+
+```
+
+Note: the target object must exists
 
 
 RENAME
@@ -649,6 +715,9 @@ X-Spock-size: 18
 
 this time the X-Spock-size is 0, so the response has an empty body and a X-Spock-size of 18 (that is the number of bytes required for listxattr() output)
 
+
+Note: on Linux, user-governed extended attributes must be prefixed with `user.`
+
 GETXATTR
 --------
 
@@ -656,9 +725,11 @@ GETXATTR
 
 FUSE hook: getxattr
 
-X-Spock headers used: X-Spock-size
+X-Spock headers used: X-Spock-size, X-Spock-target
 
 Expected status: 200 OK on success
+
+Note: on Linux, user-governed extended attributes must be prefixed with `user.`
 
 SETXATTR
 --------
@@ -667,12 +738,34 @@ SETXATTR
 
 FUSE hook: getxattr
 
-X-Spock headers used: X-Spock-flag
+X-Spock headers used: X-Spock-flag, X-Spock-target
 
 Expected status: 200 OK on success
 
 Note: you may expect a 201 response, but technically 201 is used when a 'resource' is created (in plain HTTP, WebDAV and its properties management is another beast). In this case we 'only' created an attribute.
 
+Set/create/change the extended atributes named as the X-Spock-target with the specified value (the value is the body of the request). 
+
+X-Spock-flag can be 0 (create or modify the object), 1 (XATTR_CREATE, fails if the attribute already exists) or 2 (XATTR_REPLACE, fails if the attribute does not exist)
+
+raw HTTP example
+
+```
+SETXATTR /foobar HTTP/1.1
+Host: example.com
+X-Spock-target: user.foo
+X-Spock-flag: 0
+Content-Length: 5
+
+helloHTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
+will create/modify the user.foo attributes of te the /foobar resource with the value 'hello'
+
+
+Note: on Linux, user-governed extended attributes must be prefixed with `user.`
 
 REMOVEXATTR
 -----------
@@ -681,9 +774,25 @@ REMOVEXATTR
 
 FUSE hook: removexattr
 
-X-Spock headers used: none
+X-Spock headers used: X-Spock-target
 
 Expected status: 200 OK on success
+
+Remove the extended attribute named as the X-Spock-target value from the resource
+
+raw HTTP example
+
+```
+REMOVEXATTR /foobar HTTP/1.1
+Host: example.com
+X-Spock-target: user.foo
+
+HTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
+Note: on Linux, user-governed extended attributes must be prefixed with `user.`
 
 UTIMENS
 -------
