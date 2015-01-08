@@ -333,7 +333,7 @@ Content-Length: 0
 
 ```
 
-The X-Spock-mode value (octal: 010600) is built as `S_IFIFO|S_IRUSR|S_IRUSR` (so a fifo with 600 permissions). The dev value is left as 0 as it is not used.
+The X-Spock-mode value (octal: 010600) is built as `S_IFIFO|S_IRUSR|S_IWUSR` (so a fifo with 600 permissions). The dev value is left as 0 as it is not used.
 
 curl example:
 
@@ -996,7 +996,7 @@ this will result in the /tmp/spockfs-server binary (that is a uWSGI server + spo
 Now you can run the server. If you choose the plugin approach (the first described):
 
 ```sh
-uwsgi --plugin 0:spockfs --http-socket :9090 --threads 8 --spockfs-mount /=/var/www
+uwsgi --plugin 0:./spockfs --http-socket :9090 --threads 8 --spockfs-mount /=/var/www
 ```
 
 this will bind uWSGI to http port 9090 with 8 threads ready to answer for spockfs requests that will be mapped to /var/www (read: a /foo request will map to /var/www/foo)
