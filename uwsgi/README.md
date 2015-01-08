@@ -425,3 +425,5 @@ route = ^/fake$ setpathinfo:/true
 ; if kratos is WebDAV addicted, and uses MKCOL instead of MKDIR, rewrite it
 route-if = equal:${REQUEST_METHOD};MKCOL setmethod:MKDIR
 ```
+
+The possibilities are unlimited, have fun
