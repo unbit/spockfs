@@ -52,8 +52,10 @@ spockfs-mount = /=var/www
 spockfs-mount = /spool=/var/spool
 
 ; mount /opt as /opt in readonly mode
-
 spockfs-ro-mount = /opt=/opt
+
+; ensure the mountpoints are correctly parsed as SCRIPT_NAME (this is required only if you have multiple spockfs mountpoints)
+manage-script-name = true
 ```
 
 run the server:
@@ -88,8 +90,10 @@ spockfs-mount = /=var/www
 spockfs-mount = /spool=/var/spool
 
 ; mount /opt as /opt in readonly mode
-
 spockfs-ro-mount = /opt=/opt
+
+; ensure the mountpoints are correctly parsed as SCRIPT_NAME (this is required only if you have multiple spockfs mountpoints)
+manage-script-name = true
 
 ;drop privileges
 uid = www-data
@@ -176,7 +180,101 @@ Placing behind nginx
 
 If you plan to use the SpockFS server in a LAN, using --http-socket uWSGI option will be more than enough (and you will get really good performance). Instead, when wanting to expose it over internet you should proxy it behind a full-featured webserver. uWSGI has its HTTP proxy embedded (the so called 'http-router'), but (as its name implies) it is only a 'router' without any kind of logic (expect for mapping domain names to specific backends and for doing load balancing).
 
-Nginx instead has tons of advanced features that makes it a perfect candidate for the job. In addition to this it supports out of the box the 'uwsgi protocol' (that is a faster way to pass informations between the proxy and the backend).
+Nginx instead, has tons of advanced features that makes it a perfect candidate for the job. In addition to this it supports out of the box the 'uwsgi protocol' (that is a faster way to pass informations between the proxy and the backend).
+
+To configure a location in nginx to be forwarded to uWSGI'spockfs plugin:
+
+```
+location /spool {
+    include uwsgi_params;
+    uwsgi_modifier1 179;
+    uwsgi_pass 127.0.0.1:3031;
+}
+```
+
+this will instruct nginx to pass all of the requests for /spool to the 127.0.0.1:3031 address using the uwsgi protocol and asking (via the modifier 179 directive) for the SpockFS plugin of the uWSGI instance.
+
+The uWSGI config will be a bit different this time
+
+```ini
+[uwsgi]
+; load the spockfs plugin in its default slot (179) as nginx will directly ask for it
+plugin = spockfs
+
+; bind to uwsgi tcp port 3031
+socket = 127.0.0.1:3031
+
+; run the master process
+master = true
+; spawn 2 processes
+processes = 2
+; spawn 2 threads for each process
+threads = 8
+
+; mount /var/www as /
+spockfs-mount = /=var/www
+
+; mount /var/spool as /spool
+spockfs-mount = /spool=/var/spool
+
+; mount /opt as /opt in readonly mode
+
+spockfs-ro-mount = /opt=/opt
+
+;drop privileges
+uid = www-data
+gid = www-data
+
+; bind the stats server on 127.0.0.1:9091
+stats = 127.0.0.1:9091
+```
+
+the only differences are the use of 'socket' instead of 'http-socket' and the load of the spockfs plugin (if needed) in its default slot (instead of forcing it to 0).
+
+Having nginx on front as a proxy will have minimal impact (between 1% and 3%). Using unix sockets instead of TCP will reduce this impact a bit (at the cost of a bit more attention when setting permissions, as unix sockets require write permissions to be accessed)
+
+```
+location /spool {
+    include uwsgi_params;
+    uwsgi_modifier1 179;
+    uwsgi_pass unix:/var/run/spockfs.socket;
+}
+```
+
+```ini
+[uwsgi]
+; load the spockfs plugin in its default slot (179) as nginx will directly ask for it
+plugin = spockfs
+
+; bind to uwsgi unix socket /var/run/spockfs.socket
+socket = /var/run/spockfs.socket
+; ensure the socket is writable by nginx
+chmod-socket = 666
+
+; run the master process
+master = true
+; spawn 2 processes
+processes = 2
+; spawn 2 threads for each process
+threads = 8
+
+; mount /var/www as /
+spockfs-mount = /=var/www
+
+; mount /var/spool as /spool
+spockfs-mount = /spool=/var/spool
+
+; mount /opt as /opt in readonly mode
+
+spockfs-ro-mount = /opt=/opt
+
+;drop privileges
+uid = www-data
+gid = www-data
+
+; bind the stats server on 127.0.0.1:9091
+stats = 127.0.0.1:9091
+```
 
 Playing with internal routing
 =============================
