@@ -627,7 +627,7 @@ X-Spock headers used: X-Spock-flag
 
 Expected status: 200 OK on success
 
-Note: you may expect a 201 response, but technically 201 it is used when a 'resource' is created (in plain HTTP, WebDAV and its properties management is another beast). In this case we 'only' created an attribute.
+Note: you may expect a 201 response, but technically 201 is used when a 'resource' is created (in plain HTTP, WebDAV and its properties management is another beast). In this case we 'only' created an attribute.
 
 
 REMOVEXATTR
