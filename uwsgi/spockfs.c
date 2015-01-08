@@ -1,10 +1,7 @@
 #include <uwsgi.h>
 
 #include <sys/statvfs.h>
-
-#ifdef __APPLE__
 #include <sys/xattr.h>
-#endif
 
 extern struct uwsgi_server uwsgi;
 
@@ -160,7 +157,7 @@ static int spockfs_access(struct wsgi_request *wsgi_req, char *path) {
         char *mode = uwsgi_get_var(wsgi_req, "HTTP_X_SPOCK_MODE", 17, &mode_len);
         if (!mode) goto end;
 
-	int i_mode = uwsgi_str_num(mode, mode_len); 
+	int i_mode = uwsgi_str_num(mode, mode_len);
 
 	if (i_mode & W_OK) {
 		spockfs_check_readonly(wsgi_req);
@@ -431,7 +428,7 @@ static int spockfs_utimens(struct wsgi_request *wsgi_req, char *path) {
 	int fd = open(path, O_WRONLY);
 	if (fd < 0) {
 		spockfs_errno(wsgi_req);
-                goto end2;		
+                goto end2;
 	}
 
 	uint16_t atime_len = 0;
@@ -445,22 +442,22 @@ static int spockfs_utimens(struct wsgi_request *wsgi_req, char *path) {
 #if !defined( __APPLE__) && !defined(__FreeBSD__)
 	struct timespec tv[2];
 	tv[0].tv_sec = uwsgi_str_num(atime, atime_len);
-	tv[0].tv_nsec = 0;	
+	tv[0].tv_nsec = 0;
 	tv[1].tv_sec = uwsgi_str_num(mtime, mtime_len);
-	tv[1].tv_nsec = 0;	
+	tv[1].tv_nsec = 0;
 	if (futimens(fd, tv)) {
 #else
 	struct timeval tv[2];
 	tv[0].tv_sec = uwsgi_str_num(atime, atime_len);
-	tv[0].tv_usec = 0;	
+	tv[0].tv_usec = 0;
 	tv[1].tv_sec = uwsgi_str_num(mtime, mtime_len);
-	tv[1].tv_usec = 0;	
+	tv[1].tv_usec = 0;
 	if (futimes(fd, tv)) {
 #endif
 		spockfs_errno(wsgi_req);
                 goto end;
 	}
-	
+
 	if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
         if (uwsgi_response_add_content_length(wsgi_req, 0)) goto end;
 
@@ -677,7 +674,7 @@ static int spockfs_rename(struct wsgi_request *wsgi_req, char *path) {
 	if (spockfs_build_path(path2, wsgi_req, target, target_len)) {
 		errno = ENOENT;
 		spockfs_errno(wsgi_req);
-		goto end;	
+		goto end;
 	}
 
         if (rename(path2, path)) {
@@ -819,17 +816,17 @@ static int spockfs_getattr(struct wsgi_request *wsgi_req, char *path) {
 	}
 	if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-mode", 12, st.st_mode)) goto end; 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-uid", 11, st.st_uid)) goto end; 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-gid", 11, st.st_gid)) goto end; 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-size", 12, st.st_size)) goto end; 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-mtime", 13, st.st_mtime)) goto end; 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-atime", 13, st.st_atime)) goto end; 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-ctime", 13, st.st_ctime)) goto end; 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-nlink", 13, st.st_nlink)) goto end; 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-blocks", 14, st.st_blocks)) goto end; 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-dev", 11, st.st_dev)) goto end; 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-ino", 11, st.st_ino)) goto end; 
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-mode", 12, st.st_mode)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-uid", 11, st.st_uid)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-gid", 11, st.st_gid)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-size", 12, st.st_size)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-mtime", 13, st.st_mtime)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-atime", 13, st.st_atime)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-ctime", 13, st.st_ctime)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-nlink", 13, st.st_nlink)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-blocks", 14, st.st_blocks)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-dev", 11, st.st_dev)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-ino", 11, st.st_ino)) goto end;
 
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
@@ -1039,7 +1036,7 @@ static int spockfs_request(struct wsgi_request *wsgi_req) {
 		return spockfs_utimens(wsgi_req, path);
 	}
 
-	
+
 	uwsgi_405(wsgi_req);
 
 	return UWSGI_OK;
