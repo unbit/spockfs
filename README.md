@@ -799,7 +799,7 @@ This is enough to run a LAN server, for more informations and examples check the
 Testing
 =======
 
-The `spockfs_tests.py` script is included in the sources. It expects a filesystem mounted under /tmp/.spockfs_testdir. Once the filesystem is mounted just run it:
+The `spockfs_tests.py` script is included in the sources. It expects a filesystem mounted under /tmp/.spockfs_testdir (ensure the dir mounted under it is empty, as the test will CLEAR it before running !!!). Once the filesystem is mounted just run it:
 
 ```sh
 python spockfs_tests.py
