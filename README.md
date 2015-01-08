@@ -796,6 +796,16 @@ If you have built the /tmp/spockfs-server binary the syntax will be a little sho
 
 This is enough to run a LAN server, for more informations and examples check the spockfs uWSGI plugin documentation here: https://github.com/unbit/spockfs/tree/master/uwsgi/README.md
 
+Testing
+=======
+
+The `spockfs_tests.py` script is included in the sources. It expects a filesystem mounted under /tmp/.spockfs_testdir. Once the filesystem is mounted just run it:
+
+```sh
+python spockfs_tests.py
+```
+
+the script requires the python xattr module (does not work On FreeBSD)
 
 Project Status
 ==============
