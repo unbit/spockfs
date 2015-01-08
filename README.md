@@ -327,6 +327,14 @@ Content-Length: 0
 
 The X-Spock-mode value (octal: 010600) is built as `S_IFIFO|S_IRUSR|S_IRUSR` (so a fifo with 600 permissions). The dev value is left as 0 as it is not used.
 
+curl example:
+
+```sh
+$ curl -D /dev/stdout -H "X-Spock-mode: 4480" -H "X-Spock-dev: 0" -X MKNOD http://host:port/foobar/fifo
+HTTP/1.1 201 Created
+Content-Length: 0
+```
+
 OPEN
 ----
 
@@ -397,6 +405,29 @@ X-Spock headers used: X-Spock-size
 Expected status: 200 OK on success
 
 truncate/resize a file to size specified by X-Spock-size header
+
+raw HTTP example
+
+```
+TRUNCATE /resizeme HTTP/1.1
+Host: example.com
+X-Spock-size: 100
+
+HTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
+will resize the resource /resizeme to 100 bytes
+
+curl example:
+
+```sh
+$ curl -D /dev/stdout -H "X-Spock-size: 100" -X TRUNCATE http://host:port/resizeme
+HTTP/1.1 200 OK
+Content-Length: 0
+
+```
 
 ACCESS
 ------
