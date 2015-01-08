@@ -1039,10 +1039,16 @@ this will result in the /tmp/spockfs-server binary (that is a uWSGI server + spo
 Now you can run the server. If you choose the plugin approach (the first described):
 
 ```sh
-uwsgi --plugin 0:./spockfs --http-socket :9090 --threads 8 --spockfs-mount /=/var/www
+uwsgi --plugin 0:spockfs --http-socket :9090 --threads 8 --spockfs-mount /=/var/www
 ```
 
 this will bind uWSGI to http port 9090 with 8 threads ready to answer for spockfs requests that will be mapped to /var/www (read: a /foo request will map to /var/www/foo)
+
+if you get an error about not finding the spockfs plugin pass its absolute path in this way:
+
+```sh
+uwsgi --plugin 0:/path/of/spockfs_plugin.so --http-socket :9090 --threads 8 --spockfs-mount /=/var/www
+```
 
 If you have built the /tmp/spockfs-server binary the syntax will be a little shorter:
 
