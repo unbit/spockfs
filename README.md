@@ -366,7 +366,7 @@ Content-Length: 0
 
 ```
 
-'1' is the POSIX flag for O_WRONLY so the previous requests check for writability of '/a_file' resource
+'1' is the POSIX flag for O_WRONLY so the previous requests checks for writability of '/a_file' resource
 
 
 CHMOD
@@ -552,7 +552,7 @@ Content-Length: 0
 MKDIR
 -----
 
-FUSE hook: mdir
+FUSE hook: mkdir
 
 X-Spock headers used: X-Spock-mode
 
