@@ -729,6 +729,22 @@ X-Spock headers used: X-Spock-size, X-Spock-target
 
 Expected status: 200 OK on success
 
+Get the value of the extended attribute named like the X-Spock-target value and returns it as the response body. Like LISTXATTR X-Spock-size set the maximum allowed size of the response, passing it as 0 will return the required size.
+
+raw HTTP example
+
+```
+GET /foobar HTTP/1.1
+Host: example.com
+X-Spock-size: 5
+X-Spock-targer: user.foo
+
+HTTP/1.1 200 OK
+Content-Length: 5
+
+hello
+```
+
 Note: on Linux, user-governed extended attributes must be prefixed with `user.`
 
 SETXATTR
@@ -824,7 +840,7 @@ this set atime and mtime of /foobar/deimos to the first second of 1 Jan 1970
 POST
 ----
 
-FUSE hook: create()
+FUSE hook: create
 
 X-Spock headers used: X-Spock-mode
 
@@ -839,6 +855,19 @@ int fd = open("path", O_CREAT|O_RDWR|O_EXCL, 0444);
 write(fd, ...);
 ```
 
+raw HTTP example
+
+```
+POST /new_file HTTP/1.1
+Host: example.com
+X-Spock-mode: 448
+
+HTTP/1.1 201 Created
+Content-Length: 0
+
+```
+
+X-Spock-mode is stat() mode (the same as the one used by MKDIR)
 
 PUT
 ---
