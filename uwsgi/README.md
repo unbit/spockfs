@@ -32,8 +32,144 @@ The following options are exposed by the plugin
 Serving directories
 ===================
 
+We use the .ini configuration format (you are free to use whatever uWSGI supports), save it as spockfs.ini
+
+```ini
+[uwsgi]
+; load the spockfs plugin in slot 0, useless if you have built it into the binary
+plugin = 0:spockfs
+
+; bind to tcp port 9090
+http-socket = :9090
+
+; spawn 8 threads
+threads = 8
+
+; mount /var/www as /
+spockfs-mount = /=var/www
+
+; mount /var/spool as /spool
+spockfs-mount = /spool=/var/spool
+
+; mount /opt as /opt in readonly mode
+
+spockfs-ro-mount = /opt=/opt
+```
+
+run the server:
+
+```sh
+uwsgi spockfs.ini
+```
+
+or if you have used the installer:
+
+```sh
+/tmp/spockfs-server spockfs.ini
+```
+
+Ensure to not run the server as root, eventually you can drop privileges with the uid and gid options:
+
+```ini
+[uwsgi]
+; load the spockfs plugin in slot 0, useless if you have built it into the binary
+plugin = 0:spockfs
+
+; bind to tcp port 9090
+http-socket = :9090
+
+; spawn 8 threads
+threads = 8
+
+; mount /var/www as /
+spockfs-mount = /=var/www
+
+; mount /var/spool as /spool
+spockfs-mount = /spool=/var/spool
+
+; mount /opt as /opt in readonly mode
+
+spockfs-ro-mount = /opt=/opt
+
+;drop privileges
+uid = www-data
+gid = www-daya
+```
+
 Concurrency
 ===========
+
+Multiprocess and multithreaded modes are highly suggested (instead of async).
+
+In this example we spawn 2 processes with 2 threads each, all governed by a master (consider it as an embedded monitor that will automatically respawn dead processes and will monitor the server status)
+
+```ini
+[uwsgi]
+; load the spockfs plugin in slot 0, useless if you have built it into the binary
+plugin = 0:spockfs
+
+; bind to tcp port 9090
+http-socket = :9090
+
+; run the master process
+master = true
+; spawn 2 processes
+processes = 2
+; spawn 2 threads for each process
+threads = 8
+
+; mount /var/www as /
+spockfs-mount = /=var/www
+
+; mount /var/spool as /spool
+spockfs-mount = /spool=/var/spool
+
+; mount /opt as /opt in readonly mode
+
+spockfs-ro-mount = /opt=/opt
+
+;drop privileges
+uid = www-data
+gid = www-data
+```
+
+uWSGI gives you tons of metrics and monitoring tools. Consider enabling the stats server (to use tools like uwsgitop)
+
+
+```ini
+[uwsgi]
+; load the spockfs plugin in slot 0, useless if you have built it into the binary
+plugin = 0:spockfs
+
+; bind to tcp port 9090
+http-socket = :9090
+
+; run the master process
+master = true
+; spawn 2 processes
+processes = 2
+; spawn 2 threads for each process
+threads = 8
+
+; mount /var/www as /
+spockfs-mount = /=var/www
+
+; mount /var/spool as /spool
+spockfs-mount = /spool=/var/spool
+
+; mount /opt as /opt in readonly mode
+
+spockfs-ro-mount = /opt=/opt
+
+;drop privileges
+uid = www-data
+gid = www-data
+
+; bind the stats server on 127.0.0.1:9091
+stats = 127.0.0.1:9091
+```
+
+telnet/nc to 127.0.0.1:9091 will give you a lot of infos (in json format). The https://github.com/unbit/uwsgitop tool will give you a top-like interface for the stats.
 
 Placing behind nginx
 ====================
