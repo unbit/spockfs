@@ -175,6 +175,44 @@ stats = 127.0.0.1:9091
 
 telnet/nc to 127.0.0.1:9091 will give you a lot of infos (in json format). The https://github.com/unbit/uwsgitop tool will give you a top-like interface for the stats.
 
+HTTPS
+=====
+
+If you want to place your instance behind HTTPS, use https-socket instead of http-socket passing it the certificate and the key:
+
+```ini
+[uwsgi]
+; load the spockfs plugin in slot 0, useless if you have built it into the binary
+plugin = 0:spockfs
+
+; bind to tcp port 9090 with ssl
+https-socket = :9090,path_to_cert,path_to_key
+
+; run the master process
+master = true
+; spawn 2 processes
+processes = 2
+; spawn 2 threads for each process
+threads = 8
+
+; mount /var/www as /
+spockfs-mount = /=var/www
+
+; mount /var/spool as /spool
+spockfs-mount = /spool=/var/spool
+
+; mount /opt as /opt in readonly mode
+
+spockfs-ro-mount = /opt=/opt
+
+;drop privileges
+uid = www-data
+gid = www-data
+
+; bind the stats server on 127.0.0.1:9091
+stats = 127.0.0.1:9091
+```
+
 Placing behind nginx
 ====================
 
@@ -361,4 +399,29 @@ spockfs-mount = /=/var/www
 
 ; route-run will force a route to always run without conditions
 route-run = ldapauth:url=ldaps://192.168.173.22:3030/,binddn=cn=foobar,bindpw=unknown
+```
+
+Remember that you can use gotos too:
+
+```ini
+[uwsgi]
+plugin = spockfs
+http-socket = :9090
+spockfs-mount = /=/var/www
+
+; when the user is kratos, jump to 'kratosrules'
+route-remote-user = ^kratos$ goto:kratosrules
+; ..otherwise interrupt the chain and continue normally
+route-run = last:
+
+; the kratos rules
+route-label = kratosrules
+; if kratos asks for /medusa, reject it
+route = ^/medusa$ break:403 Forbidden
+; if kratos asks for /null, returns not found
+route = ^/null$ break:404 Not Found
+; if kratos asks for /fake, rewrite it to /true
+route = ^/fake$ setpathinfo:/true
+; if kratos is WebDAV addicted, and uses MKCOL instead of MKDIR, rewrite it
+route-if = equal:${REQUEST_METHOD};MKCOL setmethod:MKDIR
 ```
