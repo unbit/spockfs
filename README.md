@@ -639,8 +639,22 @@ Standard headers used: Range
 
 Expected status: 200 OK on success
 
-This method physically "pre-allocates" blocks for the specified file. It is generally used for performance reasons and it is currently a Linux-only call.
+This method physically "pre-allocates" blocks for the specified file. It is generally used for performance reasons and it is currently a Linux-only call. X-Spock-mode should be set to 0 as portability issues must be investigated.
 
+raw HTTP example
+
+```
+FALLOCATE /bigfile HTTP/1.1
+Host: example.com
+Range: bytes=400-500
+X-Spock-mode: 0
+
+HTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
+will allocate disk space from byte 400 to 500 of the /bifgile resource
 
 STATFS
 ------
@@ -734,7 +748,7 @@ Get the value of the extended attribute named like the X-Spock-target value and 
 raw HTTP example
 
 ```
-GET /foobar HTTP/1.1
+GETXATTR /foobar HTTP/1.1
 Host: example.com
 X-Spock-size: 5
 X-Spock-targer: user.foo
@@ -752,7 +766,7 @@ SETXATTR
 
 (Currently unsupported on FreeBSD)
 
-FUSE hook: getxattr
+FUSE hook: setxattr
 
 X-Spock headers used: X-Spock-flag, X-Spock-target
 
@@ -872,7 +886,7 @@ X-Spock-mode is stat() mode (the same as the one used by MKDIR)
 PUT
 ---
 
-FUSE hook: write()
+FUSE hook: write
 
 X-Spock headers used: none
 
@@ -903,7 +917,7 @@ this will write the string 'spock' at bytes 100, 101, 102, 103 and 104 of the en
 GET
 ---
 
-FUSE hook: read()
+FUSE hook: read
 
 X-Spock headers used: none
 
@@ -931,7 +945,7 @@ this returns bytes 100, 101, 102, 103 and 104 previously written by the PUT exam
 DELETE
 ------
 
-FUSE hook: unlink()
+FUSE hook: unlink
 
 X-Spock headers used: none
 
