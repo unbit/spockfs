@@ -374,6 +374,19 @@ Expected status: 200 OK on success
 
 Note: this will probably never success if you run your server over a true filesystem as unprivileged user
 
+raw HTTP example:
+
+```
+CHOWN /foobar HTTP/1.1
+Host: example.com
+X-Spock-uid: 1000
+X-Spock-gid: 1000
+
+HTTP/1.1 200 OK
+Content-Length: 0
+
+```
+
 TRUNCATE
 --------
 
