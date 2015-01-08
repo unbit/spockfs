@@ -1,7 +1,9 @@
 #include <uwsgi.h>
 
 #include <sys/statvfs.h>
+#ifndef __FreeBSD__
 #include <sys/xattr.h>
+#endif
 
 extern struct uwsgi_server uwsgi;
 
