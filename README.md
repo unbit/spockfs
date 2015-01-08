@@ -629,7 +629,7 @@ Special behaviour: every file must be created with owner write privilege, otherw
 ```c
 ; creating a file with only read privileges, but the file descriptor has write support
 int fd = open("path", O_CREAT|O_RDWR|O_EXCL, 0444);
-// this will fail in spockfs as there are no write privileges on the file
+// this would fail in spockfs if there are no write privileges on the file
 write(fd, ...);
 ```
 
