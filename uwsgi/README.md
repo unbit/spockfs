@@ -174,5 +174,9 @@ telnet/nc to 127.0.0.1:9091 will give you a lot of infos (in json format). The h
 Placing behind nginx
 ====================
 
+If you plan to use the SpockFS server in a LAN, using --http-socket uWSGI option will be more than enough (and you will get really good performance). Instead, when wanting to expose it over internet you should proxy it behind a full-featured webserver. uWSGI has its HTTP proxy embedded (the so called 'http-router'), but (as its name implies) it is only a 'router' without any kind of logic (expect for mapping domain names to specific backends and for doing load balancing).
+
+Nginx instead has tons of advanced features that makes it a perfect candidate for the job. In addition to this it supports out of the box the 'uwsgi protocol' (that is a faster way to pass informations between the proxy and the backend).
+
 Playing with internal routing
 =============================
