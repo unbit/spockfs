@@ -808,6 +808,13 @@ DELETE /enterprise HTTP/1.1
 Host: example.com
 
 HTTP/1.1 200 OK
+Content-Length: 0
+```
+
+curl example:
+
+```sh
+$ curl -D /dev/stdout -X DELETE http://host:port/enterprise
 ```
 
 Todo
