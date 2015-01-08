@@ -532,19 +532,24 @@ Content-Length: 0
 LISTXATTR
 ---------
 
+(Currently unsupported on FreeBSD)
+
 FUSE hook: listxattr
 
-X-Spock headers used: node
+X-Spock headers used: X-Spock-size
 
 Expected status: 200 OK on success
 
-Returns the list of extended attributes names for a resource. The format is the same of READDIR (each name separated by a newline)
+Returns the list of extended attributes names for a resource. The format is the same of READDIR (each name separated by a newline).
+
+The output size must fit into X-Spock-size value. If X-Spock-size is zero, the header will be returned in the response too with the size required for the full list.
 
 raw HTTP example
 
 ```
 LISTXATTR /foobar HTTP/1.1
 Host: example.com
+X-Spock-size: 4096
 
 HTTP/1.1 200 OK
 Content-Length: 18
@@ -553,15 +558,35 @@ user.foo
 user.bar
 ```
 
+the request specify a X-Spock-size of 4k so the output (that is 18 bytes) will fit without problems.
+
+```
+LISTXATTR /foobar HTTP/1.1
+Host: example.com
+X-Spock-size: 0
+
+HTTP/1.1 200 OK
+Content-Length: 0
+X-Spock-size: 18
+
+```
+
+this time the X-Spock-size is 0, so the response has an empty body and a X-Spock-size of 18 (that is the number of bytes required for listxattr() output)
 
 GETXATTR
 --------
 
+(Currently unsupported on FreeBSD)
+
 SETXATTR
 --------
 
+(Currently unsupported on FreeBSD)
+
 REMOVEXATTR
 -----------
+
+(Currently unsupported on FreeBSD)
 
 UTIMENS
 -------
