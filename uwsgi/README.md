@@ -426,4 +426,4 @@ route = ^/fake$ setpathinfo:/true
 route-if = equal:${REQUEST_METHOD};MKCOL setmethod:MKDIR
 ```
 
-The possibilities are unlimited, have fun
+The possibilities are unlimited, have fun.
