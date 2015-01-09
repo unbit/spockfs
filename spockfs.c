@@ -274,7 +274,11 @@ static char *spockfs_prepare_url(const char *base, size_t base_len, const char *
 	return url;
 }
 
+#ifdef CURLOPT_XFERINFOFUNCTION
 static int spockfs_interrupted(void *clientp, curl_off_t dltotal,  curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+#else
+static int spockfs_interrupted(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
+#endif
 	if (fuse_interrupted()) return -1;
 	return 0;
 }
@@ -294,7 +298,11 @@ static int spockfs_http(const char *method, const char *path, struct spockfs_htt
 		return -ENOMEM;
 	}
 
+#ifdef CURLOPT_XFERINFOFUNCTION
 	curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, spockfs_interrupted);
+#else
+	curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, spockfs_interrupted);
+#endif
 	curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 	curl_easy_setopt(curl, CURLOPT_SHARE, spockfs_config.dns_cache);
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30);
@@ -806,6 +814,7 @@ end:
 }
 
 #ifndef __APPLE__
+#if FUSE_MAJOR_VERSION > 2 || (FUSE_MAJOR_VERSION == 2 && FUSE_MINOR_VERSION >= 9)
 static int spockfs_fallocate(const char *path, int mode, off_t offset, off_t size, struct fuse_file_info *fi) {
 	
 	spockfs_init2();
@@ -822,6 +831,7 @@ static int spockfs_fallocate(const char *path, int mode, off_t offset, off_t siz
 end:
 	spockfs_free2();	
 }
+#endif
 #endif
 
 static int spockfs_utimens(const char *path, const struct timespec tv[2]) {
@@ -861,7 +871,9 @@ static struct fuse_operations spockfs_ops = {
 	.link = spockfs_link,
 	.rename = spockfs_rename,
 #ifndef __APPLE__
+#if FUSE_MAJOR_VERSION > 2 || (FUSE_MAJOR_VERSION == 2 && FUSE_MINOR_VERSION >= 9)
 	.fallocate = spockfs_fallocate,
+#endif
 #endif
 	.statfs = spockfs_statfs,
 	.listxattr = spockfs_listxattr,
