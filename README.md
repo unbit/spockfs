@@ -969,6 +969,12 @@ curl example:
 $ curl -D /dev/stdout -X DELETE http://host:port/enterprise
 ```
 
+Credits/Contributors
+--------------------
+
+* Roberto De Ioris
+* Adriano Di Luzio
+
 Todo
 ----
 
@@ -1081,9 +1087,8 @@ Why ?
 
 Unbit is already developing an high performance 9p network filesystem server (https://github.com/unbit/9spock), but during development we came up with this really simple (and working) implementation. You can build a server really fast and over battle-tested technologies (nginx, apache, uWSGI ...) and web stacks (PSGI, WSGI, Rack ...).
 
-Finally, after having worked/developed the https://github.com/unbit/davvy project (a WebDAV/CalDAV/CardDAV django implementation) and the (always-in-unstable-state) WebDAV uWSGI plugin, i came up with the conclusion that i will never touch again any WebDAV-related thing. Seriously.
 
 Why 'Spock' ?
 =============
 
-Why not ? Instead of using cryptozoological animals or musicians names (or acronyms, like my company generally does) this time i want to make a tribute to the best figure of The United Federation of Planets 
+Why not ? Instead of using cryptozoological animals or musicians names (or acronyms, like my company generally does) this time we want to make a tribute to the best figure of The United Federation of Planets 
