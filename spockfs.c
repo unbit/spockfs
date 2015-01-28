@@ -99,7 +99,7 @@ struct spockfs_http_rr {
 
 static struct curl_slist *spockfs_add_header_num(struct curl_slist *headers, char *name, int64_t value) {
 	char header[64];
-        int ret = snprintf(header, 64, "X-Spock-%s: %lld", name, (long long) value);
+        int ret = snprintf(header, 64, "Spock-%s: %lld", name, (long long) value);
         if (ret <= 0 || ret > 64) {
 		if (headers) curl_slist_free_all(headers);
                 return NULL;
@@ -134,7 +134,7 @@ static struct curl_slist *spockfs_add_header_target(struct curl_slist *headers, 
 		if (headers) curl_slist_free_all(headers);
 		return NULL;
 	}
-	memcpy(header, "X-Spock-target: ", 16);
+	memcpy(header, "Spock-target: ", 16);
 	memcpy(header + 16, target, target_len);
 	header[16 + target_len] = 0;
         struct curl_slist *ret_headers = curl_slist_append(headers, header);
@@ -175,67 +175,67 @@ size_t spockfs_http_headers(char *ptr, size_t size, size_t nmemb, void *userdata
         struct spockfs_http_rr *sh_rr = (struct spockfs_http_rr *) userdata;
         size_t len = size * nmemb;
 	int64_t value = -1;
-	if ((value = spockfs_get_header_num(ptr, len, "X-Spock-size: ", 14)) >= 0) {
+	if ((value = spockfs_get_header_num(ptr, len, "Spock-size: ", 14)) >= 0) {
 		sh_rr->x_spock_size = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-mode: ", 14)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-mode: ", 14)) >= 0) {
 		sh_rr->x_spock_mode = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-uid: ", 13)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-uid: ", 13)) >= 0) {
 		sh_rr->x_spock_uid = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-gid: ", 13)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-gid: ", 13)) >= 0) {
 		sh_rr->x_spock_gid = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-mtime: ", 15)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-mtime: ", 15)) >= 0) {
 		sh_rr->x_spock_mtime = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-atime: ", 15)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-atime: ", 15)) >= 0) {
 		sh_rr->x_spock_atime = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-ctime: ", 15)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-ctime: ", 15)) >= 0) {
 		sh_rr->x_spock_ctime = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-nlink: ", 15)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-nlink: ", 15)) >= 0) {
 		sh_rr->x_spock_nlink = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-blocks: ", 16)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-blocks: ", 16)) >= 0) {
 		sh_rr->x_spock_blocks = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-dev: ", 13)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-dev: ", 13)) >= 0) {
 		sh_rr->x_spock_dev = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-ino: ", 13)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-ino: ", 13)) >= 0) {
 		sh_rr->x_spock_ino = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-bsize: ", 15)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-bsize: ", 15)) >= 0) {
 		sh_rr->x_spock_bsize = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-frsize: ", 16)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-frsize: ", 16)) >= 0) {
 		sh_rr->x_spock_frsize = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-bfree: ", 15)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-bfree: ", 15)) >= 0) {
 		sh_rr->x_spock_bfree = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-bavail: ", 16)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-bavail: ", 16)) >= 0) {
 		sh_rr->x_spock_bavail = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-files: ", 15)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-files: ", 15)) >= 0) {
 		sh_rr->x_spock_files = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-ffree: ", 15)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-ffree: ", 15)) >= 0) {
 		sh_rr->x_spock_ffree = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-favail: ", 16)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-favail: ", 16)) >= 0) {
 		sh_rr->x_spock_favail = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-fsid: ", 14)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-fsid: ", 14)) >= 0) {
 		sh_rr->x_spock_fsid = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-flag: ", 14)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-flag: ", 14)) >= 0) {
 		sh_rr->x_spock_flag = value;
 	} 
-	else if ((value = spockfs_get_header_num(ptr, len, "X-Spock-namemax: ", 17)) >= 0) {
+	else if ((value = spockfs_get_header_num(ptr, len, "Spock-namemax: ", 17)) >= 0) {
 		sh_rr->x_spock_namemax = value;
 	} 
         return len;
