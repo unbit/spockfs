@@ -319,7 +319,7 @@ static int spockfs_listxattr(struct wsgi_request *wsgi_req, char *path) {
         	}
 		if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
 		if (uwsgi_response_add_content_length(wsgi_req, 0)) goto end;
-		spockfs_response_add_header_num(wsgi_req, "X-Spock-size", 12, rlen);
+		spockfs_response_add_header_num(wsgi_req, "Spock-size", 12, rlen);
 		goto end;
 	}
 
@@ -388,7 +388,7 @@ static int spockfs_getxattr(struct wsgi_request *wsgi_req, char *path) {
                 }
                 if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
                 if (uwsgi_response_add_content_length(wsgi_req, 0)) goto end;
-                spockfs_response_add_header_num(wsgi_req, "X-Spock-size", 12, rlen);
+                spockfs_response_add_header_num(wsgi_req, "Spock-size", 12, rlen);
                 goto end;
         }
 
@@ -818,17 +818,17 @@ static int spockfs_getattr(struct wsgi_request *wsgi_req, char *path) {
 	}
 	if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
 
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-mode", 12, st.st_mode)) goto end;
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-uid", 11, st.st_uid)) goto end;
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-gid", 11, st.st_gid)) goto end;
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-size", 12, st.st_size)) goto end;
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-mtime", 13, st.st_mtime)) goto end;
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-atime", 13, st.st_atime)) goto end;
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-ctime", 13, st.st_ctime)) goto end;
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-nlink", 13, st.st_nlink)) goto end;
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-blocks", 14, st.st_blocks)) goto end;
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-dev", 11, st.st_dev)) goto end;
-	if (spockfs_response_add_header_num(wsgi_req, "X-Spock-ino", 11, st.st_ino)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-mode", 12, st.st_mode)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-uid", 11, st.st_uid)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-gid", 11, st.st_gid)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-size", 12, st.st_size)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-mtime", 13, st.st_mtime)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-atime", 13, st.st_atime)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-ctime", 13, st.st_ctime)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-nlink", 13, st.st_nlink)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-blocks", 14, st.st_blocks)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-dev", 11, st.st_dev)) goto end;
+	if (spockfs_response_add_header_num(wsgi_req, "Spock-ino", 11, st.st_ino)) goto end;
 
 	uwsgi_response_add_content_length(wsgi_req, 0);
 
@@ -844,17 +844,17 @@ static int spockfs_statfs(struct wsgi_request *wsgi_req, char *path) {
         }
         if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
 
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-bsize", 13, st.f_bsize)) goto end;
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-frsize", 14, st.f_frsize)) goto end;
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-blocks", 14, st.f_blocks)) goto end;
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-bfree", 13, st.f_bfree)) goto end;
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-bavail", 14, st.f_bavail)) goto end;
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-files", 13, st.f_files)) goto end;
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-ffree", 13, st.f_ffree)) goto end;
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-favail", 14, st.f_favail)) goto end;
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-fsid", 12, st.f_fsid)) goto end;
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-flag", 12, st.f_flag)) goto end;
-        if (spockfs_response_add_header_num(wsgi_req, "X-Spock-namemax", 15, st.f_namemax)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-bsize", 13, st.f_bsize)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-frsize", 14, st.f_frsize)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-blocks", 14, st.f_blocks)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-bfree", 13, st.f_bfree)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-bavail", 14, st.f_bavail)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-files", 13, st.f_files)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-ffree", 13, st.f_ffree)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-favail", 14, st.f_favail)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-fsid", 12, st.f_fsid)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-flag", 12, st.f_flag)) goto end;
+        if (spockfs_response_add_header_num(wsgi_req, "Spock-namemax", 15, st.f_namemax)) goto end;
 
         uwsgi_response_add_content_length(wsgi_req, 0);
 

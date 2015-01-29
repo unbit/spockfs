@@ -7,7 +7,7 @@ It is built upon plain HTTP methods and headers (no XML, no XML and no XML) and 
 
 This page is mainly for Specs, if you only want to download a server and a client (for Linux, FreeBSD and OSX) jump here: https://github.com/unbit/spockfs/blob/master/README.md#the-reference-fuse-client
 
-SPECS 0.1
+SPECS 0.2
 =========
 
 Note: we use the term "object" for identifying filesystem items. They can be directories, files, symlinks or whatever supported by the specs. When the term "object" is used it means the method can be applied to any kind of resource.
@@ -45,35 +45,35 @@ While the following "standard" ones are used:
 * GET
 * DELETE
 
-A group of headers are required to manage filesystem-related informations or special operations. All headers are prefixed with `X-Spock-`.
+A group of headers are required to manage filesystem-related informations or special operations. All headers are prefixed with `Spock-`.
 
 The following ones are for stat()-related operations:
 
-* X-Spock-mode (for mode_t values and similar)
-* X-Spock-uid (for uid)
-* X-Spock-gid (for gid)
-* X-Spock-size (for specifying sizes)
-* X-Spock-mtime (the modification time in unix time)
-* X-Spock-atime (the access time in unix time)
-* X-Spock-ctime (the creation time in unix time)
-* X-Spock-nlink (the number of links of an object)
-* X-Spock-blocks (the number of blocks os an object)
-* X-Spock-dev (the device id)
-* X-Spock-ino (the inode number, unused by default in FUSE)
-* X-Spock-flag (generic flag, used by open() too)
-* X-Spock-target (generic string used for symlink values, rename operations and for the names of extended attributes)
+* Spock-mode (for mode_t values and similar)
+* Spock-uid (for uid)
+* Spock-gid (for gid)
+* Spock-size (for specifying sizes)
+* Spock-mtime (the modification time in unix time)
+* Spock-atime (the access time in unix time)
+* Spock-ctime (the creation time in unix time)
+* Spock-nlink (the number of links of an object)
+* Spock-blocks (the number of blocks os an object)
+* Spock-dev (the device id)
+* Spock-ino (the inode number, unused by default in FUSE)
+* Spock-flag (generic flag, used by open() too)
+* Spock-target (generic string used for symlink values, rename operations and for the names of extended attributes)
 
 The following ones are for statvfs() calls, they map 1:1 with the stavfs struct, and you will use them only if you want to implement the STATFS method in your server/client:
 
-* X-Spock-bsize
-* X-Spock-frsize
-* X-Spock-bfree
-* X-Spock-bavail
-* X-Spock-files
-* X-Spock-ffree
-* X-Spock-favail
-* X-Spock-fsid
-* X-Spock-namemax
+* Spock-bsize
+* Spock-frsize
+* Spock-bfree
+* Spock-bavail
+* Spock-files
+* Spock-ffree
+* Spock-favail
+* Spock-fsid
+* Spock-namemax
 
 
 Finally these three "standard" headers are used:
@@ -182,7 +182,7 @@ READDIR
 
 FUSE hook: readdir()
 
-X-Spock headers used: none
+Spock headers used: none
 
 Expected status: 200 OK on success
 
@@ -234,7 +234,7 @@ GETATTR
 
 FUSE hook: getattr()
 
-X-Spock headers used: X-Spock-mode, X-Spock-uid, X-Spock-gid, X-Spock-size, X-Spock-mtime, X-Spock-atime, X-Spock-ctime, X-Spock-nlink, X-Spock-blocks, X-Spock-dev, X-Spock-ino
+Spock headers used: Spock-mode, Spock-uid, Spock-gid, Spock-size, Spock-mtime, Spock-atime, Spock-ctime, Spock-nlink, Spock-blocks, Spock-dev, Spock-ino
 
 Expected status: 200 OK on success
 
@@ -248,17 +248,17 @@ Host: example.com
 
 HTTP/1.1 200 OK
 Content-Length: 0
-X-Spock-mode: 17407
-X-Spock-uid: 1000
-X-Spock-gid: 1000
-X-Spock-size: 374
-X-Spock-mtime: 1420481543
-X-Spock-atime: 1420481542
-X-Spock-ctime: 1420481543
-X-Spock-nlink: 11
-X-Spock-blocks: 1
-X-Spock-dev: 16777224
-X-Spock-ino: 106280423
+Spock-mode: 17407
+Spock-uid: 1000
+Spock-gid: 1000
+Spock-size: 374
+Spock-mtime: 1420481543
+Spock-atime: 1420481542
+Spock-ctime: 1420481543
+Spock-nlink: 11
+Spock-blocks: 1
+Spock-dev: 16777224
+Spock-ino: 106280423
 
 ```
 
@@ -269,17 +269,17 @@ curl example:
 ```sh
 $ curl -X GETATTR -D /dev/stdout http://host:port/
 HTTP/1.1 200 OK
-X-Spock-mode: 16877
-X-Spock-uid: 1000
-X-Spock-gid: 1000
-X-Spock-size: 4096
-X-Spock-mtime: 1420489499
-X-Spock-atime: 1420499434
-X-Spock-ctime: 1420489499
-X-Spock-nlink: 5
-X-Spock-blocks: 8
-X-Spock-dev: 2049
-X-Spock-ino: 459840
+Spock-mode: 16877
+Spock-uid: 1000
+Spock-gid: 1000
+Spock-size: 4096
+Spock-mtime: 1420489499
+Spock-atime: 1420499434
+Spock-ctime: 1420489499
+Spock-nlink: 5
+Spock-blocks: 8
+Spock-dev: 2049
+Spock-ino: 459840
 Content-Length: 0
 ```
 
@@ -293,17 +293,17 @@ def application(environ, start_response):
         st = os.stat(path)
         headers = []
         headers.append(('Content-Length', '0'))
-        headers.append(('X-Spock-mode', str(st.st_mode))
-        headers.append(('X-Spock-uid', str(st.st_uid))
-        headers.append(('X-Spock-gid', str(st.st_gid))
-        headers.append(('X-Spock-size', str(st.st_size))
-        headers.append(('X-Spock-mtime', str(st.st_mtime))
-        headers.append(('X-Spock-atime', str(st.st_atime))
-        headers.append(('X-Spock-ctime', str(st.st_ctime))
-        headers.append(('X-Spock-nlink', str(st.st_nlink))
-        headers.append(('X-Spock-blocks', str(st.st_blocks))
-        headers.append(('X-Spock-dev', str(st.st_dev))
-        headers.append(('X-Spock-ino', str(st.st_ino))
+        headers.append(('Spock-mode', str(st.st_mode))
+        headers.append(('Spock-uid', str(st.st_uid))
+        headers.append(('Spock-gid', str(st.st_gid))
+        headers.append(('Spock-size', str(st.st_size))
+        headers.append(('Spock-mtime', str(st.st_mtime))
+        headers.append(('Spock-atime', str(st.st_atime))
+        headers.append(('Spock-ctime', str(st.st_ctime))
+        headers.append(('Spock-nlink', str(st.st_nlink))
+        headers.append(('Spock-blocks', str(st.st_blocks))
+        headers.append(('Spock-dev', str(st.st_dev))
+        headers.append(('Spock-ino', str(st.st_ino))
         start_response('200 OK', headers)
         return []
 ```
@@ -313,7 +313,7 @@ MKNOD
 
 FUSE hook: mknod()
 
-X-Spock headers used: X-Spock-mode, X-Spock-dev
+Spock headers used: Spock-mode, Spock-dev
 
 Expected status: 201 Created on success
 
@@ -325,20 +325,20 @@ raw HTTP example:
 ```
 MKNOD /foobar/fifo HTTP/1.1
 Host: example.com
-X-Spock-mode: 4480
-X-Spock-dev: 0
+Spock-mode: 4480
+Spock-dev: 0
 
 HTTP/1.1 201 Created
 Content-Length: 0
 
 ```
 
-The X-Spock-mode value (octal: 010600) is built as `S_IFIFO|S_IRUSR|S_IWUSR` (so a fifo with 600 permissions). The dev value is left as 0 as it is not used.
+The Spock-mode value (octal: 010600) is built as `S_IFIFO|S_IRUSR|S_IWUSR` (so a fifo with 600 permissions). The dev value is left as 0 as it is not used.
 
 curl example:
 
 ```sh
-$ curl -D /dev/stdout -H "X-Spock-mode: 4480" -H "X-Spock-dev: 0" -X MKNOD http://host:port/foobar/fifo
+$ curl -D /dev/stdout -H "Spock-mode: 4480" -H "Spock-dev: 0" -X MKNOD http://host:port/foobar/fifo
 HTTP/1.1 201 Created
 Content-Length: 0
 ```
@@ -348,7 +348,7 @@ OPEN
 
 FUSE hook: open
 
-X-Spock headers used: X-Spock-flag
+Spock headers used: Spock-flag
 
 Expected status: 200 OK on success
 
@@ -359,7 +359,7 @@ raw HTTP example
 ```
 OPEN /a_file HTTP/1.1
 Host: example.com
-X-Spock-flag: 1
+Spock-flag: 1
 
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -374,18 +374,18 @@ CHMOD
 
 FUSE hook: chmod
 
-X-Spock headers used: X-Spock-mode
+Spock headers used: Spock-mode
 
 Expected status: 200 OK on success
 
-Change permissions on the specified resource. X-Spock-mode is the stat() mode field.
+Change permissions on the specified resource. Spock-mode is the stat() mode field.
 
 raw HTTP example
 
 ```
 CHMOD /writable_for_all HTTP/1.1
 Host: example.com
-X-Spock-mode: 438
+Spock-mode: 438
 
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -399,7 +399,7 @@ CHOWN
 
 FUSE hook: chown
 
-X-Spock headers used: X-Spock-uid, X-Spock-gid
+Spock headers used: Spock-uid, Spock-gid
 
 Expected status: 200 OK on success
 
@@ -410,8 +410,8 @@ raw HTTP example:
 ```
 CHOWN /foobar HTTP/1.1
 Host: example.com
-X-Spock-uid: 1000
-X-Spock-gid: 1000
+Spock-uid: 1000
+Spock-gid: 1000
 
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -425,18 +425,18 @@ TRUNCATE
 
 FUSE hook: truncate
 
-X-Spock headers used: X-Spock-size
+Spock headers used: Spock-size
 
 Expected status: 200 OK on success
 
-truncate/resize a file to size specified by X-Spock-size header
+truncate/resize a file to size specified by Spock-size header
 
 raw HTTP example
 
 ```
 TRUNCATE /resizeme HTTP/1.1
 Host: example.com
-X-Spock-size: 100
+Spock-size: 100
 
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -448,7 +448,7 @@ will resize the resource /resizeme to 100 bytes
 curl example:
 
 ```sh
-$ curl -D /dev/stdout -H "X-Spock-size: 100" -X TRUNCATE http://host:port/resizeme
+$ curl -D /dev/stdout -H "Spock-size: 100" -X TRUNCATE http://host:port/resizeme
 HTTP/1.1 200 OK
 Content-Length: 0
 
@@ -459,7 +459,7 @@ ACCESS
 
 FUSE hook: access
 
-X-Spock headers used: X-Spock-mode
+Spock headers used: Spock-mode
 
 Expected status: 200 OK on success
 
@@ -470,7 +470,7 @@ raw HTTP example
 ```
 ACCESS /am_i_writable HTTP/1.1
 Host: example.com
-X-Spock-mode: 2
+Spock-mode: 2
 
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -484,16 +484,16 @@ SYMLINK
 
 FUSE hook: symlink
 
-X-Spock headers used: X-Spock-target
+Spock headers used: Spock-target
 
 Expected status: 201 Created on success
 
-Create a new symlink pointing to the X-Spock-target header value
+Create a new symlink pointing to the Spock-target header value
 
 ```
 SYMLINK /i_am_a_link HTTP/1.1
 Host: example.com
-X-Spock-target: /opt/foobar
+Spock-target: /opt/foobar
 
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -509,7 +509,7 @@ READLINK
 
 FUSE hook: readlink
 
-X-Spock headers used: none
+Spock headers used: none
 
 Expected status: 200 OK on success
 
@@ -532,7 +532,7 @@ RMDIR
 
 FUSE hook: rmdir
 
-X-Spock headers used: none
+Spock headers used: none
 
 Expected status: 200 OK on success
 
@@ -554,25 +554,25 @@ MKDIR
 
 FUSE hook: mkdir
 
-X-Spock headers used: X-Spock-mode
+Spock headers used: Spock-mode
 
 Expected status: 201 Created
 
-Create a new directory, X-Spock-mode is the stat() mode (like CHMOD)
+Create a new directory, Spock-mode is the stat() mode (like CHMOD)
 
 raw HTTP example
 
 ```
 MKDIR /foobar/test HTTP/1.1
 Host: example.com
-X-Spock-mode: 448
+Spock-mode: 448
 
 HTTP/1.1 201 Created
 Content-Length: 0
 
 ```
 
-X-Spock-mode is (256 | 128 | 64) octal (0700) or `S_IRUSR|S_IWUSR|S_IXUSR`
+Spock-mode is (256 | 128 | 64) octal (0700) or `S_IRUSR|S_IWUSR|S_IXUSR`
 
 
 LINK
@@ -580,17 +580,17 @@ LINK
 
 FUSE hook: link
 
-X-Spock headers used: X-Spock-target
+Spock headers used: Spock-target
 
 Expected status: 201 Created on success
 
-Create a new hardlink pointing to the X-Spock-target header value
+Create a new hardlink pointing to the Spock-target header value
 
 
 ```
 LINK /i_am_a_hardlink HTTP/1.1
 Host: example.com
-X-Spock-target: /opt/foobar
+Spock-target: /opt/foobar
 
 HTTP/1.1 201 Created
 Content-Length: 0
@@ -605,18 +605,18 @@ RENAME
 
 FUSE hook: rename
 
-X-Spock headers used: X-Spock-target
+Spock headers used: Spock-target
 
 Expected status: 200 OK on success
 
-Rename the object specified in X-Spock-target header with the resource name
+Rename the object specified in Spock-target header with the resource name
 
 raw HTTP example
 
 ```
 RENAME /foobar/deimos HTTP/1.1
 Host: example.com
-X-Spock-target: /foobar/kratos
+Spock-target: /foobar/kratos
 
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -633,13 +633,13 @@ FALLOCATE
 
 FUSE hook: fallocate
 
-X-Spock headers used: X-Spock-mode
+Spock headers used: Spock-mode
 
 Standard headers used: Range
 
 Expected status: 200 OK on success
 
-This method physically "pre-allocates" blocks for the specified file. It is generally used for performance reasons and it is currently a Linux-only call. X-Spock-mode should be set to 0 as portability issues must be investigated.
+This method physically "pre-allocates" blocks for the specified file. It is generally used for performance reasons and it is currently a Linux-only call. Spock-mode should be set to 0 as portability issues must be investigated.
 
 raw HTTP example
 
@@ -647,7 +647,7 @@ raw HTTP example
 FALLOCATE /bigfile HTTP/1.1
 Host: example.com
 Range: bytes=400-500
-X-Spock-mode: 0
+Spock-mode: 0
 
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -661,7 +661,7 @@ STATFS
 
 FUSE hook: statfs
 
-X-Spock headers used: none
+Spock headers used: none
 
 Expected status: 200 OK on success
 
@@ -670,17 +670,17 @@ curl example:
 ```sh
 $ curl -X STATFS -D /dev/stdout http://host:port/
 HTTP/1.1 200 OK
-X-Spock-bsize: 4096
-X-Spock-frsize: 4096
-X-Spock-blocks: 5006245
-X-Spock-bfree: 306563
-X-Spock-bavail: 79344
-X-Spock-files: 1286144
-X-Spock-ffree: 499225
-X-Spock-favail: 499225
-X-Spock-fsid: 16569270516359368890
-X-Spock-flag: 4096
-X-Spock-namemax: 255
+Spock-bsize: 4096
+Spock-frsize: 4096
+Spock-blocks: 5006245
+Spock-bfree: 306563
+Spock-bavail: 79344
+Spock-files: 1286144
+Spock-ffree: 499225
+Spock-favail: 499225
+Spock-fsid: 16569270516359368890
+Spock-flag: 4096
+Spock-namemax: 255
 Content-Length: 0
 
 ```
@@ -692,20 +692,20 @@ LISTXATTR
 
 FUSE hook: listxattr
 
-X-Spock headers used: X-Spock-size
+Spock headers used: Spock-size
 
 Expected status: 200 OK on success
 
 Returns the list of extended attributes names for a resource. The format is the same of READDIR (each name separated by a newline).
 
-The output size must fit into X-Spock-size value. If X-Spock-size is zero, the header will be returned in the response too with the size required for the full list.
+The output size must fit into Spock-size value. If Spock-size is zero, the header will be returned in the response too with the size required for the full list.
 
 raw HTTP example
 
 ```
 LISTXATTR /foobar HTTP/1.1
 Host: example.com
-X-Spock-size: 4096
+Spock-size: 4096
 
 HTTP/1.1 200 OK
 Content-Length: 18
@@ -714,20 +714,20 @@ user.foo
 user.bar
 ```
 
-the request specify a X-Spock-size of 4k so the output (that is 18 bytes) will fit without problems.
+the request specify a Spock-size of 4k so the output (that is 18 bytes) will fit without problems.
 
 ```
 LISTXATTR /foobar HTTP/1.1
 Host: example.com
-X-Spock-size: 0
+Spock-size: 0
 
 HTTP/1.1 200 OK
 Content-Length: 0
-X-Spock-size: 18
+Spock-size: 18
 
 ```
 
-this time the X-Spock-size is 0, so the response has an empty body and a X-Spock-size of 18 (that is the number of bytes required for listxattr() output)
+this time the Spock-size is 0, so the response has an empty body and a Spock-size of 18 (that is the number of bytes required for listxattr() output)
 
 
 Note: on Linux, user-governed extended attributes must be prefixed with `user.`
@@ -739,19 +739,19 @@ GETXATTR
 
 FUSE hook: getxattr
 
-X-Spock headers used: X-Spock-size, X-Spock-target
+Spock headers used: Spock-size, Spock-target
 
 Expected status: 200 OK on success
 
-Get the value of the extended attribute named like the X-Spock-target value and returns it as the response body. Like LISTXATTR X-Spock-size set the maximum allowed size of the response, passing it as 0 will return the required size.
+Get the value of the extended attribute named like the Spock-target value and returns it as the response body. Like LISTXATTR Spock-size set the maximum allowed size of the response, passing it as 0 will return the required size.
 
 raw HTTP example
 
 ```
 GETXATTR /foobar HTTP/1.1
 Host: example.com
-X-Spock-size: 5
-X-Spock-targer: user.foo
+Spock-size: 5
+Spock-targer: user.foo
 
 HTTP/1.1 200 OK
 Content-Length: 5
@@ -768,23 +768,23 @@ SETXATTR
 
 FUSE hook: setxattr
 
-X-Spock headers used: X-Spock-flag, X-Spock-target
+Spock headers used: Spock-flag, Spock-target
 
 Expected status: 200 OK on success
 
 Note: you may expect a 201 response, but technically 201 is used when a 'resource' is created (in plain HTTP, WebDAV and its properties management is another beast). In this case we 'only' created an attribute.
 
-Set/create/change the extended atributes named as the X-Spock-target with the specified value (the value is the body of the request). 
+Set/create/change the extended atributes named as the Spock-target with the specified value (the value is the body of the request). 
 
-X-Spock-flag can be 0 (create or modify the object), 1 (XATTR_CREATE, fails if the attribute already exists) or 2 (XATTR_REPLACE, fails if the attribute does not exist)
+Spock-flag can be 0 (create or modify the object), 1 (XATTR_CREATE, fails if the attribute already exists) or 2 (XATTR_REPLACE, fails if the attribute does not exist)
 
 raw HTTP example
 
 ```
 SETXATTR /foobar HTTP/1.1
 Host: example.com
-X-Spock-target: user.foo
-X-Spock-flag: 0
+Spock-target: user.foo
+Spock-flag: 0
 Content-Length: 5
 
 helloHTTP/1.1 200 OK
@@ -804,18 +804,18 @@ REMOVEXATTR
 
 FUSE hook: removexattr
 
-X-Spock headers used: X-Spock-target
+Spock headers used: Spock-target
 
 Expected status: 200 OK on success
 
-Remove the extended attribute named as the X-Spock-target value from the resource
+Remove the extended attribute named as the Spock-target value from the resource
 
 raw HTTP example
 
 ```
 REMOVEXATTR /foobar HTTP/1.1
 Host: example.com
-X-Spock-target: user.foo
+Spock-target: user.foo
 
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -829,7 +829,7 @@ UTIMENS
 
 FUSE hook: utimens
 
-X-Spock headers used: X-Spock-atime, X-Spock-mtime
+Spock headers used: Spock-atime, Spock-mtime
 
 Expected status: 200 OK on success
 
@@ -840,8 +840,8 @@ raw HTTP example:
 ```
 UTIMENS /foobar/deimos HTTP/1.1
 Host: example.com
-X-Spock-atime: 1
-X-Spock-mtime: 1
+Spock-atime: 1
+Spock-mtime: 1
 
 HTTP/1.1 200 OK
 Content-Length: 0
@@ -856,7 +856,7 @@ POST
 
 FUSE hook: create
 
-X-Spock headers used: X-Spock-mode
+Spock headers used: Spock-mode
 
 Expected status: 201 Created on success
 
@@ -874,21 +874,21 @@ raw HTTP example
 ```
 POST /new_file HTTP/1.1
 Host: example.com
-X-Spock-mode: 448
+Spock-mode: 448
 
 HTTP/1.1 201 Created
 Content-Length: 0
 
 ```
 
-X-Spock-mode is stat() mode (the same as the one used by MKDIR)
+Spock-mode is stat() mode (the same as the one used by MKDIR)
 
 PUT
 ---
 
 FUSE hook: write
 
-X-Spock headers used: none
+Spock headers used: none
 
 Standard headers used: Content-Range
 
@@ -919,7 +919,7 @@ GET
 
 FUSE hook: read
 
-X-Spock headers used: none
+Spock headers used: none
 
 Standard headers used: Range
 
@@ -947,7 +947,7 @@ DELETE
 
 FUSE hook: unlink
 
-X-Spock headers used: none
+Spock headers used: none
 
 Expected status: 200 OK on success
 
@@ -974,6 +974,7 @@ Credits/Contributors
 
 * Roberto De Ioris
 * Adriano Di Luzio
+* Nate Abele
 
 Todo
 ----
