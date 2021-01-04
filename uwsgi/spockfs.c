@@ -131,7 +131,7 @@ static int spockfs_get(struct wsgi_request *wsgi_req, char *path) {
 
 	size_t fsize = st.st_size;
 	// security check
-	if (wsgi_req->range_from > fsize) {
+	if (wsgi_req->range_from >= fsize) {
 		wsgi_req->range_from = 0;
 		wsgi_req->range_to = 0;
 	}
@@ -141,7 +141,7 @@ static int spockfs_get(struct wsgi_request *wsgi_req, char *path) {
 			fsize = st.st_size - wsgi_req->range_from;
 		}
 		if (uwsgi_response_prepare_headers(wsgi_req, "206 Partial Content", 19)) goto end;
-		if (uwsgi_response_add_content_range(wsgi_req, wsgi_req->range_from, wsgi_req->range_to, st.st_size)) goto end;
+		if (uwsgi_response_add_content_range(wsgi_req, wsgi_req->range_from, wsgi_req->range_from + fsize - 1, st.st_size)) goto end;
 	}
 	else {
 		if (uwsgi_response_prepare_headers(wsgi_req, "200 OK", 6)) goto end;
